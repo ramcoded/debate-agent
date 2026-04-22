@@ -1,0 +1,875 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Debate Arena</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&family=Lora:ital,wght@0,400;0,500;1,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #0b0b10;
+      --surface: #13131c;
+      --surface-2: #1a1a26;
+      --border: #252535;
+      --border-bright: #35354a;
+      --text: #e2ddd4;
+      --text-muted: #6b6b82;
+      --text-dim: #3a3a50;
+      --teal: #4ecdc4;
+      --coral: #ff6b6b;
+      --yellow: #ffe66d;
+      --purple: #a78bfa;
+      --gold: #f59e0b;
+      --gold-dim: rgba(245,158,11,0.12);
+    }
+
+    html, body {
+      height: 100%;
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Lora', Georgia, serif;
+      font-size: 15px;
+      line-height: 1.7;
+    }
+
+    /* ── Scrollbar ── */
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: var(--bg); }
+    ::-webkit-scrollbar-thumb { background: var(--border-bright); border-radius: 3px; }
+
+    /* ── Layout ── */
+    .page {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 0 24px 80px;
+    }
+
+    .container { width: 100%; max-width: 1080px; }
+
+    /* ── Header ── */
+    header {
+      width: 100%;
+      max-width: 1080px;
+      padding: 48px 0 32px;
+      display: flex;
+      align-items: baseline;
+      gap: 16px;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 56px;
+    }
+
+    .logo {
+      font-family: 'Playfair Display', serif;
+      font-size: 13px;
+      font-weight: 400;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+    }
+
+    .logo-sep { color: var(--border-bright); flex: 1; height: 1px; background: var(--border); align-self: center; }
+
+    .logo-tag {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      color: var(--text-dim);
+      letter-spacing: 0.05em;
+    }
+
+    /* ── Stage section ── */
+    #stage { width: 100%; max-width: 1080px; }
+
+    /* ── Intro / Topic Form ── */
+    #intro {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 24px 0 0;
+      text-align: center;
+      gap: 0;
+    }
+
+    .intro-eyebrow {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      color: var(--text-dim);
+      margin-bottom: 20px;
+    }
+
+    .intro-title {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(42px, 7vw, 80px);
+      font-weight: 900;
+      line-height: 1.05;
+      letter-spacing: -0.02em;
+      color: var(--text);
+      margin-bottom: 16px;
+    }
+
+    .intro-title em {
+      font-style: italic;
+      color: var(--text-muted);
+    }
+
+    .intro-sub {
+      font-size: 15px;
+      color: var(--text-muted);
+      max-width: 480px;
+      margin-bottom: 52px;
+      font-style: italic;
+    }
+
+    .form-wrap {
+      width: 100%;
+      max-width: 660px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .input-row {
+      display: flex;
+      gap: 12px;
+      width: 100%;
+    }
+
+    #topic-input {
+      flex: 1;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 14px 18px;
+      font-family: 'Lora', serif;
+      font-size: 15px;
+      color: var(--text);
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    #topic-input::placeholder { color: var(--text-dim); }
+    #topic-input:focus { border-color: var(--border-bright); }
+
+    #start-btn {
+      padding: 14px 28px;
+      background: var(--text);
+      color: var(--bg);
+      border: none;
+      border-radius: 6px;
+      font-family: 'Playfair Display', serif;
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: opacity 0.15s, transform 0.15s;
+    }
+
+    #start-btn:hover { opacity: 0.9; transform: translateY(-1px); }
+    #start-btn:active { transform: translateY(0); }
+    #start-btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+
+    .rounds-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      justify-content: center;
+    }
+
+    .rounds-label {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      color: var(--text-dim);
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+
+    .rounds-btns { display: flex; gap: 6px; }
+
+    .round-opt {
+      width: 36px; height: 28px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      color: var(--text-muted);
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .round-opt.active {
+      background: var(--surface-2);
+      border-color: var(--border-bright);
+      color: var(--text);
+    }
+
+    .example-topics {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      justify-content: center;
+      margin-top: 20px;
+    }
+
+    .example-chip {
+      padding: 5px 12px;
+      background: transparent;
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .example-chip:hover {
+      border-color: var(--border-bright);
+      color: var(--text);
+    }
+
+    /* ── Arena ── */
+    #arena { display: none; }
+
+    .arena-header {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 36px;
+      padding-bottom: 20px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .arena-topic {
+      font-family: 'Playfair Display', serif;
+      font-size: 22px;
+      font-weight: 700;
+      font-style: italic;
+      color: var(--text);
+      flex: 1;
+    }
+
+    .arena-badge {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--text-dim);
+      padding: 4px 10px;
+      border: 1px solid var(--border);
+      border-radius: 3px;
+    }
+
+    /* ── Round header ── */
+    .round-header {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin: 40px 0 24px;
+      opacity: 0;
+      animation: fadeSlideIn 0.4s ease forwards;
+    }
+
+    .round-label {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      white-space: nowrap;
+    }
+
+    .round-line { flex: 1; height: 1px; background: var(--border); }
+
+    /* ── Debater grid ── */
+    .debaters-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+
+    @media (max-width: 640px) {
+      .debaters-grid { grid-template-columns: 1fr; }
+    }
+
+    /* ── Debater card ── */
+    .debater-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 20px 22px 22px;
+      border-left: 3px solid transparent;
+      transition: border-color 0.3s, background 0.3s, box-shadow 0.3s;
+      min-height: 160px;
+      opacity: 0;
+      animation: fadeSlideIn 0.4s ease forwards;
+    }
+
+    .debater-card.speaking {
+      background: var(--surface-2);
+      box-shadow: 0 0 0 1px var(--card-color, #fff) inset, 0 8px 32px rgba(0,0,0,0.3);
+    }
+
+    .debater-card.speaking .card-left-bar {
+      animation: pulse-bar 1.2s ease-in-out infinite;
+    }
+
+    .debater-card.done { opacity: 0.7; }
+
+    .card-header {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+
+    .card-avatar {
+      width: 38px; height: 38px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      flex-shrink: 0;
+      background: rgba(255,255,255,0.05);
+    }
+
+    .card-meta { flex: 1; min-width: 0; }
+
+    .card-name {
+      font-family: 'Playfair Display', serif;
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--text);
+      line-height: 1.2;
+    }
+
+    .card-role {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      margin-top: 3px;
+    }
+
+    .card-status {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px;
+      color: var(--text-dim);
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .status-dot {
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: var(--text-dim);
+      transition: background 0.3s;
+    }
+
+    .speaking .status-dot {
+      background: currentColor;
+      animation: blink-dot 0.8s ease infinite;
+    }
+
+    .card-body {
+      font-size: 13.5px;
+      line-height: 1.75;
+      color: var(--text-muted);
+      min-height: 60px;
+    }
+
+    .card-body.has-text { color: var(--text); }
+
+    .cursor {
+      display: inline-block;
+      width: 2px; height: 14px;
+      background: var(--text-muted);
+      margin-left: 1px;
+      vertical-align: middle;
+      animation: blink-cursor 0.6s step-end infinite;
+    }
+
+    .cursor.hidden { display: none; }
+
+    /* ── Judge section ── */
+    #judge-section {
+      margin-top: 52px;
+      opacity: 0;
+      animation: fadeSlideIn 0.5s ease forwards;
+    }
+
+    .judge-header {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 20px;
+    }
+
+    .judge-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 13px;
+      font-weight: 400;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--gold);
+    }
+
+    .judge-line { flex: 1; height: 1px; background: linear-gradient(to right, rgba(245,158,11,0.4), transparent); }
+
+    .judge-card {
+      background: var(--gold-dim);
+      border: 1px solid rgba(245,158,11,0.2);
+      border-radius: 8px;
+      border-left: 3px solid var(--gold);
+      padding: 28px 32px;
+    }
+
+    .judge-verdict {
+      font-size: 15px;
+      line-height: 1.8;
+      color: var(--text);
+    }
+
+    .judge-verdict strong { color: var(--gold); font-weight: 500; }
+
+    /* ── Status bar ── */
+    #status-bar {
+      position: fixed;
+      bottom: 0; left: 0; right: 0;
+      height: 40px;
+      background: var(--surface);
+      border-top: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      padding: 0 32px;
+      gap: 16px;
+      z-index: 100;
+    }
+
+    .status-text {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      color: var(--text-muted);
+      flex: 1;
+    }
+
+    .progress-track {
+      width: 120px; height: 2px;
+      background: var(--border);
+      border-radius: 1px;
+      overflow: hidden;
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: var(--text-muted);
+      width: 0%;
+      transition: width 0.4s ease;
+      border-radius: 1px;
+    }
+
+    /* ── Animations ── */
+    @keyframes fadeSlideIn {
+      from { opacity: 0; transform: translateY(12px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes blink-cursor {
+      0%, 100% { opacity: 1; }
+      50%       { opacity: 0; }
+    }
+
+    @keyframes blink-dot {
+      0%, 100% { opacity: 1; }
+      50%       { opacity: 0.2; }
+    }
+
+    @keyframes pulse-bar {
+      0%, 100% { opacity: 1; }
+      50%       { opacity: 0.4; }
+    }
+
+    /* ── New debate button ── */
+    #new-debate-btn {
+      display: none;
+      margin: 40px auto 0;
+      padding: 12px 28px;
+      background: transparent;
+      border: 1px solid var(--border-bright);
+      border-radius: 6px;
+      font-family: 'Playfair Display', serif;
+      font-size: 14px;
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    #new-debate-btn:hover { color: var(--text); border-color: var(--text-muted); }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <header>
+      <span class="logo">Debate Arena</span>
+      <span class="logo-sep"></span>
+      <span class="logo-tag">multi-agent · consensus synthesis</span>
+    </header>
+
+    <div id="stage">
+      <!-- Intro / form -->
+      <div id="intro">
+        <div class="intro-eyebrow">Multi-Agent Intelligence</div>
+        <h1 class="intro-title">Four Minds.<br><em>One Verdict.</em></h1>
+        <p class="intro-sub">Enter any topic. Four expert AI agents debate it in real time — then a Judge synthesizes the truth.</p>
+
+        <div class="form-wrap">
+          <div class="input-row">
+            <input
+              id="topic-input"
+              type="text"
+              placeholder="e.g. Should AI systems have legal personhood?"
+              autocomplete="off"
+            />
+            <button id="start-btn">Begin →</button>
+          </div>
+          <div class="rounds-row">
+            <span class="rounds-label">Rounds</span>
+            <div class="rounds-btns">
+              <button class="round-opt" data-val="1">1</button>
+              <button class="round-opt active" data-val="2">2</button>
+              <button class="round-opt" data-val="3">3</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="example-topics">
+          <button class="example-chip">AI replacing developers</button>
+          <button class="example-chip">Open-sourcing LLMs</button>
+          <button class="example-chip">Microservices vs. monoliths</button>
+          <button class="example-chip">Universal basic income</button>
+          <button class="example-chip">Regulating social media</button>
+        </div>
+      </div>
+
+      <!-- Arena -->
+      <div id="arena">
+        <div class="arena-header">
+          <div class="arena-topic" id="arena-topic"></div>
+          <div class="arena-badge" id="arena-badge">preparing</div>
+        </div>
+        <div id="rounds-container"></div>
+        <div id="judge-section" style="display:none"></div>
+        <button id="new-debate-btn">← New debate</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="status-bar">
+    <span class="status-text" id="status-text">Ready.</span>
+    <div class="progress-track">
+      <div class="progress-fill" id="progress-fill"></div>
+    </div>
+  </div>
+
+  <script>
+    // ── State ──────────────────────────────────────────────────────────
+    const PERSONAS = {};
+    let selectedRounds = 2;
+    let totalSteps = 0;
+    let completedSteps = 0;
+    let currentSource = null;
+
+    // ── Round selector ─────────────────────────────────────────────────
+    document.querySelectorAll('.round-opt').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.round-opt').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        selectedRounds = parseInt(btn.dataset.val);
+      });
+    });
+
+    // ── Example chips ──────────────────────────────────────────────────
+    document.querySelectorAll('.example-chip').forEach(chip => {
+      chip.addEventListener('click', () => {
+        document.getElementById('topic-input').value = chip.textContent;
+      });
+    });
+
+    // ── Start debate ───────────────────────────────────────────────────
+    document.getElementById('start-btn').addEventListener('click', startDebate);
+    document.getElementById('topic-input').addEventListener('keydown', e => {
+      if (e.key === 'Enter') startDebate();
+    });
+
+    document.getElementById('new-debate-btn').addEventListener('click', () => {
+      if (currentSource) { currentSource.close(); currentSource = null; }
+      document.getElementById('arena').style.display = 'none';
+      document.getElementById('intro').style.display = 'flex';
+      document.getElementById('new-debate-btn').style.display = 'none';
+      document.getElementById('rounds-container').innerHTML = '';
+      document.getElementById('judge-section').style.display = 'none';
+      document.getElementById('judge-section').innerHTML = '';
+      setStatus('Ready.');
+      setProgress(0);
+    });
+
+    function startDebate() {
+      const topic = document.getElementById('topic-input').value.trim();
+      if (!topic) { shake(document.getElementById('topic-input')); return; }
+
+      document.getElementById('intro').style.display = 'none';
+      document.getElementById('arena').style.display = 'block';
+      document.getElementById('arena-topic').textContent = `"${topic}"`;
+      document.getElementById('arena-badge').textContent = 'connecting…';
+      document.getElementById('rounds-container').innerHTML = '';
+      document.getElementById('judge-section').style.display = 'none';
+      document.getElementById('new-debate-btn').style.display = 'none';
+
+      const url = `/api/debate?topic=${encodeURIComponent(topic)}&num_rounds=${selectedRounds}`;
+      currentSource = new EventSource(url);
+
+      currentSource.onmessage = handleEvent;
+      currentSource.onerror = () => {
+        setStatus('Connection error. Please try again.');
+        document.getElementById('arena-badge').textContent = 'error';
+        document.getElementById('new-debate-btn').style.display = 'block';
+        currentSource.close();
+      };
+    }
+
+    // ── Event handler ──────────────────────────────────────────────────
+    const cardMap = {}; // persona_id → { card, bodyEl, cursorEl }
+
+    function handleEvent(e) {
+      const ev = JSON.parse(e.data);
+
+      switch (ev.type) {
+        case 'debate_start':
+          ev.personas.forEach(p => { PERSONAS[p.id] = p; });
+          totalSteps = ev.num_rounds * ev.personas.length + 1; // +1 for judge
+          completedSteps = 0;
+          document.getElementById('arena-badge').textContent = 'round 1 of ' + ev.num_rounds;
+          setStatus('Debate starting…');
+          setProgress(0);
+          break;
+
+        case 'round_start':
+          document.getElementById('arena-badge').textContent = `round ${ev.round} of ${ev.total_rounds}`;
+          addRoundHeader(ev.round, ev.total_rounds);
+          break;
+
+        case 'agent_start':
+          activateCard(ev.persona_id, ev.round);
+          setStatus(`${ev.persona_name} — ${ev.persona_role} is arguing…`);
+          break;
+
+        case 'agent_token':
+          appendToken(ev.persona_id, ev.token);
+          break;
+
+        case 'agent_end':
+          deactivateCard(ev.persona_id);
+          completedSteps++;
+          setProgress(completedSteps / totalSteps);
+          break;
+
+        case 'round_end':
+          break;
+
+        case 'judge_start':
+          setStatus('Judge is synthesizing the verdict…');
+          document.getElementById('arena-badge').textContent = 'verdict';
+          showJudgeSection();
+          break;
+
+        case 'judge_token':
+          appendJudgeToken(ev.token);
+          break;
+
+        case 'judge_end':
+          hideJudgeCursor();
+          completedSteps++;
+          setProgress(1);
+          break;
+
+        case 'debate_end':
+          setStatus(`Debate complete — ${ev.total_arguments} arguments across ${selectedRounds} round${selectedRounds > 1 ? 's' : ''}.`);
+          document.getElementById('arena-badge').textContent = 'complete';
+          document.getElementById('new-debate-btn').style.display = 'block';
+          currentSource.close();
+          break;
+
+        case 'error':
+          setStatus('Error: ' + ev.message);
+          document.getElementById('new-debate-btn').style.display = 'block';
+          currentSource.close();
+          break;
+      }
+    }
+
+    // ── DOM helpers ────────────────────────────────────────────────────
+    let currentGridEl = null;
+
+    function addRoundHeader(round, total) {
+      const container = document.getElementById('rounds-container');
+
+      const header = document.createElement('div');
+      header.className = 'round-header';
+      header.innerHTML = `
+        <span class="round-label">Round ${round}</span>
+        <span class="round-line"></span>
+      `;
+      container.appendChild(header);
+
+      const grid = document.createElement('div');
+      grid.className = 'debaters-grid';
+      grid.id = `grid-round-${round}`;
+      container.appendChild(grid);
+      currentGridEl = grid;
+
+      // Pre-create all 4 debater cards (they'll be populated on agent_start)
+    }
+
+    function getOrCreateCard(personaId, round) {
+      const key = `${personaId}-r${round}`;
+      if (cardMap[key]) return cardMap[key];
+
+      const grid = document.getElementById(`grid-round-${round}`);
+      if (!grid) return null;
+
+      const p = PERSONAS[personaId];
+      if (!p) return null;
+
+      const card = document.createElement('div');
+      card.className = 'debater-card';
+      card.id = `card-${key}`;
+      card.style.setProperty('--card-color', p.color);
+      card.style.borderLeftColor = p.color;
+      card.style.animationDelay = `${Object.keys(cardMap).length * 0.07}s`;
+
+      card.innerHTML = `
+        <div class="card-header">
+          <div class="card-avatar">${p.emoji}</div>
+          <div class="card-meta">
+            <div class="card-name">${p.name}</div>
+            <div class="card-role" style="color:${p.color}">${p.role}</div>
+          </div>
+          <div class="card-status">
+            <span class="status-dot" style="color:${p.color}"></span>
+            <span class="status-label">waiting</span>
+          </div>
+        </div>
+        <div class="card-body" id="body-${key}"><span class="cursor hidden"></span></div>
+      `;
+
+      grid.appendChild(card);
+
+      const bodyEl = card.querySelector(`#body-${key}`);
+      const cursorEl = card.querySelector('.cursor');
+
+      cardMap[key] = { card, bodyEl, cursorEl, text: '' };
+      return cardMap[key];
+    }
+
+    function activateCard(personaId, round) {
+      const entry = getOrCreateCard(personaId, round);
+      if (!entry) return;
+      entry.card.classList.add('speaking');
+      entry.card.querySelector('.status-label').textContent = 'speaking';
+      entry.cursorEl.classList.remove('hidden');
+    }
+
+    function appendToken(personaId, token) {
+      // Find the most recent card for this persona
+      const keys = Object.keys(cardMap).filter(k => k.startsWith(personaId + '-'));
+      const key = keys[keys.length - 1];
+      if (!key) return;
+      const entry = cardMap[key];
+      entry.text += token;
+      // Remove cursor, set text, re-add cursor
+      entry.bodyEl.classList.add('has-text');
+      entry.bodyEl.textContent = entry.text;
+      entry.bodyEl.appendChild(entry.cursorEl);
+    }
+
+    function deactivateCard(personaId) {
+      const keys = Object.keys(cardMap).filter(k => k.startsWith(personaId + '-'));
+      const key = keys[keys.length - 1];
+      if (!key) return;
+      const entry = cardMap[key];
+      entry.card.classList.remove('speaking');
+      entry.card.classList.add('done');
+      entry.card.querySelector('.status-label').textContent = 'done';
+      entry.cursorEl.classList.add('hidden');
+    }
+
+    let judgeBodyEl = null;
+    let judgeCursorEl = null;
+    let judgeText = '';
+
+    function showJudgeSection() {
+      const section = document.getElementById('judge-section');
+      section.style.display = 'block';
+      section.style.animation = 'none';
+      section.offsetHeight; // reflow
+      section.style.animation = '';
+      section.style.opacity = '0';
+      section.style.animation = 'fadeSlideIn 0.5s ease forwards';
+
+      section.innerHTML = `
+        <div class="judge-header">
+          <span class="judge-title">⚖ Judge's Verdict</span>
+          <span class="judge-line"></span>
+        </div>
+        <div class="judge-card">
+          <div class="judge-verdict" id="judge-body"><span class="cursor" id="judge-cursor"></span></div>
+        </div>
+      `;
+
+      judgeBodyEl = document.getElementById('judge-body');
+      judgeCursorEl = document.getElementById('judge-cursor');
+      judgeText = '';
+    }
+
+    function appendJudgeToken(token) {
+      if (!judgeBodyEl) return;
+      judgeText += token;
+      // Render markdown-lite: bold
+      const rendered = judgeText
+        .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+        .replace(/\n\n/g, '<br><br>');
+      judgeBodyEl.innerHTML = rendered;
+      judgeBodyEl.appendChild(judgeCursorEl);
+    }
+
+    function hideJudgeCursor() {
+      if (judgeCursorEl) judgeCursorEl.classList.add('hidden');
+    }
+
+
+    // ── Utilities ──────────────────────────────────────────────────────
+    function setStatus(msg) {
+      document.getElementById('status-text').textContent = msg;
+    }
+
+    function setProgress(ratio) {
+      document.getElementById('progress-fill').style.width = `${Math.min(ratio * 100, 100)}%`;
+    }
+
+    function shake(el) {
+      el.style.animation = 'none';
+      el.style.borderColor = 'var(--coral)';
+      setTimeout(() => { el.style.borderColor = ''; }, 800);
+    }
+  </script>
+</body>
+</html>

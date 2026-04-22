@@ -1,0 +1,39 @@
+import anthropic
+from core.models import DebateMessage
+from typing import AsyncGenerator
+
+_client = anthropic.AsyncAnthropic()
+
+_JUDGE_SYSTEM = (
+    "You are an impartial, intellectually rigorous Judge presiding over a multi-expert debate. "
+    "Your verdict must: (1) identify which arguments were strongest and why, "
+    "(2) name specific points of consensus that emerged, "
+    "(3) name the key unresolved tensions, "
+    "(4) deliver a clear, actionable synthesis — not a wishy-washy 'all sides have merit' non-answer. "
+    "Structure your verdict with clear sections. Be decisive. Write 4-5 paragraphs."
+)
+
+
+async def stream_verdict(
+    topic: str,
+    history: list[DebateMessage],
+) -> AsyncGenerator[str, None]:
+    transcript = "\n\n".join(
+        f"**{m.persona_name} — {m.persona_role}** (Round {m.round}):\n{m.content}"
+        for m in history
+    )
+
+    prompt = (
+        f"Debate topic: **{topic}**\n\n"
+        f"Full transcript:\n\n{transcript}\n\n"
+        "Deliver your verdict. Be decisive, specific, and name names."
+    )
+
+    async with _client.messages.stream(
+        model="claude-sonnet-4-6",
+        max_tokens=700,
+        system=_JUDGE_SYSTEM,
+        messages=[{"role": "user", "content": prompt}],
+    ) as stream:
+        async for token in stream.text_stream:
+            yield token
