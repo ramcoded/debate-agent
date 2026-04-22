@@ -1,0 +1,95 @@
+{
+  "version": "1.0.0",
+  "lastScanned": 1776866391294,
+  "projectRoot": "D:\\Agentic\\debate-agent",
+  "techStack": {
+    "languages": [
+      {
+        "name": "Python",
+        "version": null,
+        "confidence": "high",
+        "markers": [
+          "requirements.txt"
+        ]
+      }
+    ],
+    "frameworks": [],
+    "packageManager": "pip",
+    "runtime": null
+  },
+  "build": {
+    "buildCommand": null,
+    "testCommand": null,
+    "lintCommand": null,
+    "devCommand": null,
+    "scripts": {}
+  },
+  "conventions": {
+    "namingStyle": null,
+    "importStyle": null,
+    "testPattern": null,
+    "fileOrganization": null
+  },
+  "structure": {
+    "isMonorepo": false,
+    "workspaces": [],
+    "mainDirectories": [],
+    "gitBranches": null
+  },
+  "customNotes": [],
+  "directoryMap": {
+    "agents": {
+      "path": "agents",
+      "purpose": null,
+      "fileCount": 4,
+      "lastAccessed": 1776866391273,
+      "keyFiles": [
+        "debater.py",
+        "judge.py",
+        "personas.py",
+        "__init__.py"
+      ]
+    },
+    "api": {
+      "path": "api",
+      "purpose": "API routes",
+      "fileCount": 2,
+      "lastAccessed": 1776866391274,
+      "keyFiles": [
+        "routes.py",
+        "__init__.py"
+      ]
+    },
+    "core": {
+      "path": "core",
+      "purpose": null,
+      "fileCount": 3,
+      "lastAccessed": 1776866391274,
+      "keyFiles": [
+        "models.py",
+        "orchestrator.py",
+        "__init__.py"
+      ]
+    },
+    "ui": {
+      "path": "ui",
+      "purpose": null,
+      "fileCount": 1,
+      "lastAccessed": 1776866391274,
+      "keyFiles": [
+        "index.html"
+      ]
+    },
+    "__pycache__": {
+      "path": "__pycache__",
+      "purpose": null,
+      "fileCount": 1,
+      "lastAccessed": 1776866391275,
+      "keyFiles": [
+        "main.cpython-312.pyc"
+      ]
+    }
+  },
+  "hotPaths": [],
+  "userDirectives": []
+}
