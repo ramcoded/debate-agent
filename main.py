@@ -24,7 +24,7 @@ app.include_router(router, prefix="/api")
 @app.get("/", response_class=HTMLResponse)
 async def index():
     html = Path("ui/index.html").read_text(encoding="utf-8")
-    return HTMLResponse(content=html)
+    return HTMLResponse(content=html, headers={"Cache-Control": "no-store"})
 
 
 if __name__ == "__main__":

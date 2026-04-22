@@ -90,6 +90,79 @@
       ]
     }
   },
-  "hotPaths": [],
+  "hotPaths": [
+    {
+      "path": "ui\\index.html",
+      "accessCount": 9,
+      "lastAccessed": 1776868056182,
+      "type": "file"
+    },
+    {
+      "path": "api\\routes.py",
+      "accessCount": 3,
+      "lastAccessed": 1776866666039,
+      "type": "file"
+    },
+    {
+      "path": "core\\orchestrator.py",
+      "accessCount": 3,
+      "lastAccessed": 1776866692039,
+      "type": "file"
+    },
+    {
+      "path": "main.py",
+      "accessCount": 3,
+      "lastAccessed": 1776868062287,
+      "type": "file"
+    },
+    {
+      "path": "agents\\judge.py",
+      "accessCount": 2,
+      "lastAccessed": 1776866623854,
+      "type": "file"
+    },
+    {
+      "path": "agents\\debater.py",
+      "accessCount": 2,
+      "lastAccessed": 1776866628710,
+      "type": "file"
+    },
+    {
+      "path": "core\\models.py",
+      "accessCount": 2,
+      "lastAccessed": 1776866653638,
+      "type": "file"
+    },
+    {
+      "path": ".env",
+      "accessCount": 2,
+      "lastAccessed": 1776866847580,
+      "type": "file"
+    },
+    {
+      "path": "requirements.txt",
+      "accessCount": 1,
+      "lastAccessed": 1776866567460,
+      "type": "file"
+    },
+    {
+      "path": ".env.example",
+      "accessCount": 1,
+      "lastAccessed": 1776866568356,
+      "type": "file"
+    },
+    {
+      "path": "api\\__init__.py",
+      "accessCount": 1,
+      "lastAccessed": 1776866578489,
+      "type": "file"
+    },
+    {
+      "path": "agents\\personas.py",
+      "accessCount": 1,
+      "lastAccessed": 1776866589754,
+      "type": "file"
+    }
+  ],
   "userDirectives": []
 }

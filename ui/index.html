@@ -587,6 +587,7 @@
     let totalSteps = 0;
     let completedSteps = 0;
     let currentSource = null;
+    let debateCompleted = false;
 
     // ── Round selector ─────────────────────────────────────────────────
     document.querySelectorAll('.round-opt').forEach(btn => {
@@ -634,12 +635,20 @@
       document.getElementById('judge-section').style.display = 'none';
       document.getElementById('new-debate-btn').style.display = 'none';
 
+      debateCompleted = false;
       const url = `/api/debate?topic=${encodeURIComponent(topic)}&num_rounds=${selectedRounds}`;
       currentSource = new EventSource(url);
 
       currentSource.onmessage = handleEvent;
-      currentSource.onerror = () => {
-        setStatus('Connection error. Please try again.');
+      currentSource.onerror = (e) => {
+        if (debateCompleted) return;
+        const state = currentSource.readyState;
+        console.error('[SSE] onerror fired. readyState:', state, 'event:', e);
+        if (state === EventSource.CONNECTING) {
+          setStatus('Connection error — server unreachable or stream dropped. Check console.');
+        } else {
+          setStatus('Connection error. Please try again.');
+        }
         document.getElementById('arena-badge').textContent = 'error';
         document.getElementById('new-debate-btn').style.display = 'block';
         currentSource.close();
@@ -702,6 +711,7 @@
           break;
 
         case 'debate_end':
+          debateCompleted = true;
           setStatus(`Debate complete — ${ev.total_arguments} arguments across ${selectedRounds} round${selectedRounds > 1 ? 's' : ''}.`);
           document.getElementById('arena-badge').textContent = 'complete';
           document.getElementById('new-debate-btn').style.display = 'block';
