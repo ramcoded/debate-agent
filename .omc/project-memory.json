@@ -156,6 +156,18 @@
       "accessCount": 1,
       "lastAccessed": 1777040491588,
       "type": "file"
+    },
+    {
+      "path": "ui\\index.html",
+      "accessCount": 1,
+      "lastAccessed": 1777040894321,
+      "type": "file"
+    },
+    {
+      "path": "README.md",
+      "accessCount": 1,
+      "lastAccessed": 1777040922513,
+      "type": "file"
     }
   ],
   "userDirectives": []
