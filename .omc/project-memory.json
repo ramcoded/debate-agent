@@ -1,6 +1,6 @@
 {
   "version": "1.0.0",
-  "lastScanned": 1776866391294,
+  "lastScanned": 1777038842891,
   "projectRoot": "D:\\Agentic\\debate-agent",
   "techStack": {
     "languages": [
@@ -42,7 +42,7 @@
       "path": "agents",
       "purpose": null,
       "fileCount": 4,
-      "lastAccessed": 1776866391273,
+      "lastAccessed": 1777038842855,
       "keyFiles": [
         "debater.py",
         "judge.py",
@@ -54,7 +54,7 @@
       "path": "api",
       "purpose": "API routes",
       "fileCount": 2,
-      "lastAccessed": 1776866391274,
+      "lastAccessed": 1777038842856,
       "keyFiles": [
         "routes.py",
         "__init__.py"
@@ -64,7 +64,7 @@
       "path": "core",
       "purpose": null,
       "fileCount": 3,
-      "lastAccessed": 1776866391274,
+      "lastAccessed": 1777038842856,
       "keyFiles": [
         "models.py",
         "orchestrator.py",
@@ -75,7 +75,7 @@
       "path": "ui",
       "purpose": null,
       "fileCount": 1,
-      "lastAccessed": 1776866391274,
+      "lastAccessed": 1777038842856,
       "keyFiles": [
         "index.html"
       ]
@@ -84,7 +84,7 @@
       "path": "__pycache__",
       "purpose": null,
       "fileCount": 1,
-      "lastAccessed": 1776866391275,
+      "lastAccessed": 1777038842857,
       "keyFiles": [
         "main.cpython-312.pyc"
       ]
@@ -92,75 +92,39 @@
   },
   "hotPaths": [
     {
-      "path": "ui\\index.html",
-      "accessCount": 9,
-      "lastAccessed": 1776868056182,
-      "type": "file"
-    },
-    {
-      "path": "api\\routes.py",
+      "path": ".env.example",
       "accessCount": 3,
-      "lastAccessed": 1776866666039,
-      "type": "file"
-    },
-    {
-      "path": "core\\orchestrator.py",
-      "accessCount": 3,
-      "lastAccessed": 1776866692039,
-      "type": "file"
-    },
-    {
-      "path": "main.py",
-      "accessCount": 3,
-      "lastAccessed": 1776868062287,
-      "type": "file"
-    },
-    {
-      "path": "agents\\judge.py",
-      "accessCount": 2,
-      "lastAccessed": 1776866623854,
+      "lastAccessed": 1777039191925,
       "type": "file"
     },
     {
       "path": "agents\\debater.py",
       "accessCount": 2,
-      "lastAccessed": 1776866628710,
+      "lastAccessed": 1777039184647,
       "type": "file"
     },
     {
-      "path": "core\\models.py",
+      "path": "agents\\judge.py",
       "accessCount": 2,
-      "lastAccessed": 1776866653638,
+      "lastAccessed": 1777039190395,
+      "type": "file"
+    },
+    {
+      "path": "requirements.txt",
+      "accessCount": 2,
+      "lastAccessed": 1777039191119,
       "type": "file"
     },
     {
       "path": ".env",
       "accessCount": 2,
-      "lastAccessed": 1776866847580,
+      "lastAccessed": 1777039192873,
       "type": "file"
     },
     {
-      "path": "requirements.txt",
+      "path": "core\\models.py",
       "accessCount": 1,
-      "lastAccessed": 1776866567460,
-      "type": "file"
-    },
-    {
-      "path": ".env.example",
-      "accessCount": 1,
-      "lastAccessed": 1776866568356,
-      "type": "file"
-    },
-    {
-      "path": "api\\__init__.py",
-      "accessCount": 1,
-      "lastAccessed": 1776866578489,
-      "type": "file"
-    },
-    {
-      "path": "agents\\personas.py",
-      "accessCount": 1,
-      "lastAccessed": 1776866589754,
+      "lastAccessed": 1777039151784,
       "type": "file"
     }
   ],

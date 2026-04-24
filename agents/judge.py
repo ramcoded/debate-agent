@@ -1,8 +1,8 @@
-import anthropic
+from groq import AsyncGroq
 from core.models import DebateMessage
 from typing import AsyncGenerator
 
-_client = anthropic.AsyncAnthropic()
+_client = AsyncGroq()
 
 _JUDGE_SYSTEM = (
     "You are an impartial, intellectually rigorous Judge presiding over a multi-expert debate. "
@@ -29,11 +29,16 @@ async def stream_verdict(
         "Deliver your verdict. Be decisive, specific, and name names."
     )
 
-    async with _client.messages.stream(
-        model="claude-sonnet-4-6",
+    stream = await _client.chat.completions.create(
+        model="llama-3.3-70b-versatile",
         max_tokens=700,
-        system=_JUDGE_SYSTEM,
-        messages=[{"role": "user", "content": prompt}],
-    ) as stream:
-        async for token in stream.text_stream:
+        messages=[
+            {"role": "system", "content": _JUDGE_SYSTEM},
+            {"role": "user", "content": prompt},
+        ],
+        stream=True,
+    )
+    async for chunk in stream:
+        token = chunk.choices[0].delta.content
+        if token:
             yield token

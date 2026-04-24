@@ -1,8 +1,8 @@
-import anthropic
+from groq import AsyncGroq
 from core.models import Persona, DebateMessage
 from typing import AsyncGenerator
 
-_client = anthropic.AsyncAnthropic()
+_client = AsyncGroq()
 
 
 async def stream_argument(
@@ -33,11 +33,16 @@ async def stream_argument(
             f"{context_block}"
         )
 
-    async with _client.messages.stream(
-        model="claude-haiku-4-5-20251001",
+    stream = await _client.chat.completions.create(
+        model="llama-3.1-8b-instant",
         max_tokens=350,
-        system=persona.system_prompt,
-        messages=[{"role": "user", "content": prompt}],
-    ) as stream:
-        async for token in stream.text_stream:
+        messages=[
+            {"role": "system", "content": persona.system_prompt},
+            {"role": "user", "content": prompt},
+        ],
+        stream=True,
+    )
+    async for chunk in stream:
+        token = chunk.choices[0].delta.content
+        if token:
             yield token
