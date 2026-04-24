@@ -61,4 +61,7 @@ async def run_debate(topic: str, num_rounds: int = 2) -> AsyncGenerator[str, Non
         yield _sse(EventType.DEBATE_END, {"total_arguments": len(history)})
 
     except Exception as e:
-        yield _sse(EventType.ERROR, {"message": str(e)})
+        # Avoid leaking internal error details (API keys, stack traces) to the client
+        import logging
+        logging.getLogger(__name__).error("Debate error: %s", e, exc_info=True)
+        yield _sse(EventType.ERROR, {"message": "An internal error occurred. Please try again."})

@@ -98,6 +98,18 @@
       "type": "file"
     },
     {
+      "path": "requirements.txt",
+      "accessCount": 3,
+      "lastAccessed": 1777040492707,
+      "type": "file"
+    },
+    {
+      "path": "core\\orchestrator.py",
+      "accessCount": 3,
+      "lastAccessed": 1777040512196,
+      "type": "file"
+    },
+    {
       "path": "agents\\debater.py",
       "accessCount": 2,
       "lastAccessed": 1777039184647,
@@ -110,21 +122,39 @@
       "type": "file"
     },
     {
-      "path": "requirements.txt",
-      "accessCount": 2,
-      "lastAccessed": 1777039191119,
-      "type": "file"
-    },
-    {
       "path": ".env",
       "accessCount": 2,
       "lastAccessed": 1777039192873,
       "type": "file"
     },
     {
+      "path": "main.py",
+      "accessCount": 2,
+      "lastAccessed": 1777040503649,
+      "type": "file"
+    },
+    {
+      "path": "api\\routes.py",
+      "accessCount": 2,
+      "lastAccessed": 1777040507306,
+      "type": "file"
+    },
+    {
       "path": "core\\models.py",
       "accessCount": 1,
       "lastAccessed": 1777039151784,
+      "type": "file"
+    },
+    {
+      "path": "agents\\personas.py",
+      "accessCount": 1,
+      "lastAccessed": 1777040435356,
+      "type": "file"
+    },
+    {
+      "path": "api\\security.py",
+      "accessCount": 1,
+      "lastAccessed": 1777040491588,
       "type": "file"
     }
   ],

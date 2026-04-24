@@ -1,17 +1,21 @@
-from fastapi import APIRouter, Query
+from fastapi import APIRouter, Query, Request
 from fastapi.responses import StreamingResponse
 from core.orchestrator import run_debate
+from api.security import limiter, sanitize_topic
 
 router = APIRouter()
 
 
 @router.get("/debate")
+@limiter.limit("5/minute")
 async def debate_stream(
+    request: Request,
     topic: str = Query(..., min_length=5, max_length=300),
     num_rounds: int = Query(default=2, ge=1, le=3),
 ):
+    clean_topic = sanitize_topic(topic)
     return StreamingResponse(
-        run_debate(topic, num_rounds),
+        run_debate(clean_topic, num_rounds),
         media_type="text/event-stream",
         headers={
             "Cache-Control": "no-cache",
