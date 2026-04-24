@@ -21,4 +21,4 @@ build/
 *.iml
 
 # OMC state & caches
-.omc/state/
+.omc/
