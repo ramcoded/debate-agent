@@ -210,6 +210,27 @@
       color: var(--text);
     }
 
+    .shorter-toggle {
+      padding: 5px 14px;
+      background: transparent;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      color: var(--text-muted);
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      letter-spacing: 0.06em;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .shorter-toggle:hover { border-color: var(--border-bright); color: var(--text); }
+
+    .shorter-toggle.active {
+      background: var(--surface-2);
+      border-color: var(--teal);
+      color: var(--teal);
+    }
+
     .example-topics {
       display: flex;
       gap: 8px;
@@ -313,8 +334,12 @@
     }
 
     .debater-card.speaking {
+      position: relative;
+      z-index: 1;
       background: var(--surface-2);
       box-shadow: 0 0 0 1px var(--card-color, #fff) inset, 0 8px 32px rgba(0,0,0,0.3);
+      transform: scale(1.015);
+      transition: border-color 0.3s, background 0.3s, box-shadow 0.3s, opacity 0.35s ease, filter 0.35s ease, transform 0.35s ease;
     }
 
     .debater-card.speaking .card-left-bar {
@@ -322,6 +347,14 @@
     }
 
     .debater-card.done { opacity: 0.7; }
+
+    /* ── Focus effect: dim idle cards when one is speaking ── */
+    .debaters-grid.has-active .debater-card:not(.speaking) {
+      opacity: 0.28;
+      filter: blur(0.6px);
+      transform: scale(0.985);
+      transition: opacity 0.35s ease, filter 0.35s ease, transform 0.35s ease;
+    }
 
     .card-header {
       display: flex;
@@ -548,6 +581,7 @@
               <button class="round-opt active" data-val="2">2</button>
               <button class="round-opt" data-val="3">3</button>
             </div>
+            <button id="shorter-toggle" class="shorter-toggle" title="Shorter agent responses">concise</button>
           </div>
         </div>
 
@@ -584,6 +618,7 @@
     // ── State ──────────────────────────────────────────────────────────
     const PERSONAS = {};
     let selectedRounds = 2;
+    let shortMode = false;
     let totalSteps = 0;
     let completedSteps = 0;
     let currentSource = null;
@@ -596,6 +631,12 @@
         btn.classList.add('active');
         selectedRounds = parseInt(btn.dataset.val);
       });
+    });
+
+    // ── Shorter toggle ─────────────────────────────────────────────────
+    document.getElementById('shorter-toggle').addEventListener('click', () => {
+      shortMode = !shortMode;
+      document.getElementById('shorter-toggle').classList.toggle('active', shortMode);
     });
 
     // ── Example chips ──────────────────────────────────────────────────
@@ -636,7 +677,7 @@
       document.getElementById('new-debate-btn').style.display = 'none';
 
       debateCompleted = false;
-      const url = `/api/debate?topic=${encodeURIComponent(topic)}&num_rounds=${selectedRounds}`;
+      const url = `/api/debate?topic=${encodeURIComponent(topic)}&num_rounds=${selectedRounds}${shortMode ? '&short=true' : ''}`;
       currentSource = new EventSource(url);
 
       currentSource.onmessage = handleEvent;
@@ -796,6 +837,8 @@
       entry.card.classList.add('speaking');
       entry.card.querySelector('.status-label').textContent = 'speaking';
       entry.cursorEl.classList.remove('hidden');
+      const grid = entry.card.closest('.debaters-grid');
+      if (grid) grid.classList.add('has-active');
     }
 
     function appendToken(personaId, token) {
@@ -820,6 +863,8 @@
       entry.card.classList.add('done');
       entry.card.querySelector('.status-label').textContent = 'done';
       entry.cursorEl.classList.add('hidden');
+      const grid = entry.card.closest('.debaters-grid');
+      if (grid) grid.classList.remove('has-active');
     }
 
     let judgeBodyEl = null;

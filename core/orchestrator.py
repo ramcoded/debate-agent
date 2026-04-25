@@ -11,7 +11,7 @@ def _sse(event_type: EventType, data: dict) -> str:
     return f"data: {payload}\n\n"
 
 
-async def run_debate(topic: str, num_rounds: int = 2) -> AsyncGenerator[str, None]:
+async def run_debate(topic: str, num_rounds: int = 2, short: bool = False) -> AsyncGenerator[str, None]:
     try:
         personas_meta = [
             {"id": p.id, "name": p.name, "role": p.role, "color": p.color, "emoji": p.emoji}
@@ -35,7 +35,7 @@ async def run_debate(topic: str, num_rounds: int = 2) -> AsyncGenerator[str, Non
                 })
 
                 full_text = ""
-                async for token in stream_argument(persona, topic, round_num, history):
+                async for token in stream_argument(persona, topic, round_num, history, short=short):
                     full_text += token
                     yield _sse(EventType.AGENT_TOKEN, {"persona_id": persona.id, "token": token})
 
