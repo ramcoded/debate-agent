@@ -11,11 +11,12 @@ def _sse(event_type: EventType, data: dict) -> str:
     return f"data: {payload}\n\n"
 
 
-async def run_debate(topic: str, num_rounds: int = 2, short: bool = False) -> AsyncGenerator[str, None]:
+async def run_debate(topic: str, num_rounds: int = 2, short: bool = False, num_agents: int = 4) -> AsyncGenerator[str, None]:
     try:
+        active_personas = PERSONAS[:2] if num_agents == 2 else PERSONAS
         personas_meta = [
             {"id": p.id, "name": p.name, "role": p.role, "color": p.color, "emoji": p.emoji}
-            for p in PERSONAS
+            for p in active_personas
         ]
         yield _sse(EventType.DEBATE_START, {"topic": topic, "num_rounds": num_rounds, "personas": personas_meta})
 
@@ -24,7 +25,7 @@ async def run_debate(topic: str, num_rounds: int = 2, short: bool = False) -> As
         for round_num in range(1, num_rounds + 1):
             yield _sse(EventType.ROUND_START, {"round": round_num, "total_rounds": num_rounds})
 
-            for persona in PERSONAS:
+            for persona in active_personas:
                 yield _sse(EventType.AGENT_START, {
                     "persona_id": persona.id,
                     "persona_name": persona.name,

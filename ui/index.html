@@ -36,12 +36,10 @@
       line-height: 1.7;
     }
 
-    /* ── Scrollbar ── */
     ::-webkit-scrollbar { width: 6px; }
     ::-webkit-scrollbar-track { background: var(--bg); }
     ::-webkit-scrollbar-thumb { background: var(--border-bright); border-radius: 3px; }
 
-    /* ── Layout ── */
     .page {
       min-height: 100vh;
       display: flex;
@@ -50,12 +48,9 @@
       padding: 0 24px 80px;
     }
 
-    .container { width: 100%; max-width: 1080px; }
-
-    /* ── Header ── */
     header {
       width: 100%;
-      max-width: 1080px;
+      max-width: 860px;
       padding: 48px 0 32px;
       display: flex;
       align-items: baseline;
@@ -73,7 +68,7 @@
       color: var(--text-muted);
     }
 
-    .logo-sep { color: var(--border-bright); flex: 1; height: 1px; background: var(--border); align-self: center; }
+    .logo-sep { flex: 1; height: 1px; background: var(--border); align-self: center; }
 
     .logo-tag {
       font-family: 'JetBrains Mono', monospace;
@@ -82,17 +77,16 @@
       letter-spacing: 0.05em;
     }
 
-    /* ── Stage section ── */
-    #stage { width: 100%; max-width: 1080px; }
+    /* ── Stage ── */
+    #stage { width: 100%; max-width: 860px; }
 
-    /* ── Intro / Topic Form ── */
+    /* ── Intro ── */
     #intro {
       display: flex;
       flex-direction: column;
       align-items: center;
       padding: 24px 0 0;
       text-align: center;
-      gap: 0;
     }
 
     .intro-eyebrow {
@@ -175,14 +169,16 @@
     #start-btn:active { transform: translateY(0); }
     #start-btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
 
-    .rounds-row {
+    /* ── Options row ── */
+    .options-row {
       display: flex;
       align-items: center;
-      gap: 10px;
+      gap: 8px;
       justify-content: center;
+      flex-wrap: wrap;
     }
 
-    .rounds-label {
+    .opt-label {
       font-family: 'JetBrains Mono', monospace;
       font-size: 11px;
       color: var(--text-dim);
@@ -190,10 +186,11 @@
       text-transform: uppercase;
     }
 
-    .rounds-btns { display: flex; gap: 6px; }
+    .opt-btns { display: flex; gap: 6px; }
 
-    .round-opt {
-      width: 36px; height: 28px;
+    .opt-btn {
+      height: 28px;
+      padding: 0 12px;
       background: var(--surface);
       border: 1px solid var(--border);
       border-radius: 4px;
@@ -202,33 +199,28 @@
       font-size: 12px;
       cursor: pointer;
       transition: all 0.15s;
+      white-space: nowrap;
     }
 
-    .round-opt.active {
+    .opt-btn:hover { border-color: var(--border-bright); color: var(--text); }
+
+    .opt-btn.active {
       background: var(--surface-2);
       border-color: var(--border-bright);
       color: var(--text);
     }
 
-    .shorter-toggle {
-      padding: 5px 14px;
-      background: transparent;
-      border: 1px solid var(--border);
-      border-radius: 4px;
-      color: var(--text-muted);
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 11px;
-      letter-spacing: 0.06em;
-      cursor: pointer;
-      transition: all 0.15s;
-    }
-
-    .shorter-toggle:hover { border-color: var(--border-bright); color: var(--text); }
-
-    .shorter-toggle.active {
+    .opt-btn.active-teal {
       background: var(--surface-2);
       border-color: var(--teal);
       color: var(--teal);
+    }
+
+    .opt-divider {
+      width: 1px;
+      height: 18px;
+      background: var(--border);
+      margin: 0 2px;
     }
 
     .example-topics {
@@ -286,14 +278,15 @@
       padding: 4px 10px;
       border: 1px solid var(--border);
       border-radius: 3px;
+      white-space: nowrap;
     }
 
-    /* ── Round header ── */
+    /* ── Round divider ── */
     .round-header {
       display: flex;
       align-items: center;
       gap: 16px;
-      margin: 40px 0 24px;
+      margin-bottom: 16px;
       opacity: 0;
       animation: fadeSlideIn 0.4s ease forwards;
     }
@@ -309,61 +302,50 @@
 
     .round-line { flex: 1; height: 1px; background: var(--border); }
 
-    /* ── Debater grid ── */
-    .debaters-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 16px;
+    /* ── Conversation thread ── */
+    .conversation-thread {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
     }
 
-    @media (max-width: 640px) {
-      .debaters-grid { grid-template-columns: 1fr; }
-    }
-
-    /* ── Debater card ── */
-    .debater-card {
+    /* ── Turn card ── */
+    .turn-card {
       background: var(--surface);
       border: 1px solid var(--border);
       border-radius: 8px;
       padding: 20px 22px 22px;
       border-left: 3px solid transparent;
-      transition: border-color 0.3s, background 0.3s, box-shadow 0.3s;
-      min-height: 160px;
       opacity: 0;
-      animation: fadeSlideIn 0.4s ease forwards;
+      animation: fadeSlideIn 0.35s ease forwards;
+      transition: background 0.3s, box-shadow 0.3s, opacity 0.35s ease, filter 0.35s ease, transform 0.35s ease;
     }
 
-    .debater-card.speaking {
-      position: relative;
-      z-index: 1;
+    .turn-card.speaking {
       background: var(--surface-2);
       box-shadow: 0 0 0 1px var(--card-color, #fff) inset, 0 8px 32px rgba(0,0,0,0.3);
-      transform: scale(1.015);
-      transition: border-color 0.3s, background 0.3s, box-shadow 0.3s, opacity 0.35s ease, filter 0.35s ease, transform 0.35s ease;
+      transform: scale(1.008);
+      position: relative;
+      z-index: 1;
     }
 
-    .debater-card.speaking .card-left-bar {
-      animation: pulse-bar 1.2s ease-in-out infinite;
-    }
+    .turn-card.done { opacity: 0.82; }
 
-    .debater-card.done { opacity: 0.7; }
-
-    /* ── Focus effect: dim idle cards when one is speaking ── */
-    .debaters-grid.has-active .debater-card:not(.speaking) {
+    /* Dim non-speaking cards while one is active */
+    .conversation-thread.has-active .turn-card:not(.speaking) {
       opacity: 0.28;
-      filter: blur(0.6px);
-      transform: scale(0.985);
-      transition: opacity 0.35s ease, filter 0.35s ease, transform 0.35s ease;
+      filter: blur(0.5px);
+      transform: scale(0.998);
     }
 
-    .card-header {
+    .turn-header {
       display: flex;
       align-items: flex-start;
       gap: 12px;
       margin-bottom: 14px;
     }
 
-    .card-avatar {
+    .turn-avatar {
       width: 38px; height: 38px;
       border-radius: 50%;
       display: flex;
@@ -374,9 +356,9 @@
       background: rgba(255,255,255,0.05);
     }
 
-    .card-meta { flex: 1; min-width: 0; }
+    .turn-meta { flex: 1; min-width: 0; }
 
-    .card-name {
+    .turn-name {
       font-family: 'Playfair Display', serif;
       font-size: 15px;
       font-weight: 700;
@@ -384,7 +366,7 @@
       line-height: 1.2;
     }
 
-    .card-role {
+    .turn-role {
       font-family: 'JetBrains Mono', monospace;
       font-size: 10px;
       letter-spacing: 0.1em;
@@ -392,7 +374,7 @@
       margin-top: 3px;
     }
 
-    .card-status {
+    .turn-status {
       font-family: 'JetBrains Mono', monospace;
       font-size: 10px;
       color: var(--text-dim);
@@ -413,14 +395,13 @@
       animation: blink-dot 0.8s ease infinite;
     }
 
-    .card-body {
+    .turn-body {
       font-size: 13.5px;
       line-height: 1.75;
       color: var(--text-muted);
-      min-height: 60px;
     }
 
-    .card-body.has-text { color: var(--text); }
+    .turn-body.has-text { color: var(--text); }
 
     .cursor {
       display: inline-block;
@@ -435,7 +416,7 @@
 
     /* ── Judge section ── */
     #judge-section {
-      margin-top: 52px;
+      margin-top: 48px;
       opacity: 0;
       animation: fadeSlideIn 0.5s ease forwards;
     }
@@ -510,27 +491,6 @@
       border-radius: 1px;
     }
 
-    /* ── Animations ── */
-    @keyframes fadeSlideIn {
-      from { opacity: 0; transform: translateY(12px); }
-      to   { opacity: 1; transform: translateY(0); }
-    }
-
-    @keyframes blink-cursor {
-      0%, 100% { opacity: 1; }
-      50%       { opacity: 0; }
-    }
-
-    @keyframes blink-dot {
-      0%, 100% { opacity: 1; }
-      50%       { opacity: 0.2; }
-    }
-
-    @keyframes pulse-bar {
-      0%, 100% { opacity: 1; }
-      50%       { opacity: 0.4; }
-    }
-
     /* ── New debate button ── */
     #new-debate-btn {
       display: none;
@@ -547,6 +507,22 @@
     }
 
     #new-debate-btn:hover { color: var(--text); border-color: var(--text-muted); }
+
+    /* ── Animations ── */
+    @keyframes fadeSlideIn {
+      from { opacity: 0; transform: translateY(12px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes blink-cursor {
+      0%, 100% { opacity: 1; }
+      50%       { opacity: 0; }
+    }
+
+    @keyframes blink-dot {
+      0%, 100% { opacity: 1; }
+      50%       { opacity: 0.2; }
+    }
   </style>
 </head>
 <body>
@@ -561,8 +537,8 @@
       <!-- Intro / form -->
       <div id="intro">
         <div class="intro-eyebrow">Multi-Agent Intelligence</div>
-        <h1 class="intro-title">Four Minds.<br><em>One Verdict.</em></h1>
-        <p class="intro-sub">Enter any topic. Four expert AI agents debate it in real time — then a Judge synthesizes the truth.</p>
+        <h1 class="intro-title"><span id="agent-count-label">Four</span> Minds.<br><em>One Verdict.</em></h1>
+        <p class="intro-sub">Enter any topic. Expert AI agents debate it in real time — then a Judge synthesizes the truth.</p>
 
         <div class="form-wrap">
           <div class="input-row">
@@ -574,14 +550,21 @@
             />
             <button id="start-btn">Begin →</button>
           </div>
-          <div class="rounds-row">
-            <span class="rounds-label">Rounds</span>
-            <div class="rounds-btns">
-              <button class="round-opt" data-val="1">1</button>
-              <button class="round-opt active" data-val="2">2</button>
-              <button class="round-opt" data-val="3">3</button>
+          <div class="options-row">
+            <span class="opt-label">Agents</span>
+            <div class="opt-btns">
+              <button class="opt-btn agent-opt" data-val="2">2</button>
+              <button class="opt-btn agent-opt active" data-val="4">4</button>
             </div>
-            <button id="shorter-toggle" class="shorter-toggle" title="Shorter agent responses">concise</button>
+            <div class="opt-divider"></div>
+            <span class="opt-label">Rounds</span>
+            <div class="opt-btns">
+              <button class="opt-btn round-opt" data-val="1">1</button>
+              <button class="opt-btn round-opt active" data-val="2">2</button>
+              <button class="opt-btn round-opt" data-val="3">3</button>
+            </div>
+            <div class="opt-divider"></div>
+            <button id="shorter-toggle" class="opt-btn" title="Shorter agent responses">concise</button>
           </div>
         </div>
 
@@ -600,7 +583,7 @@
           <div class="arena-topic" id="arena-topic"></div>
           <div class="arena-badge" id="arena-badge">preparing</div>
         </div>
-        <div id="rounds-container"></div>
+        <div id="conversation-thread" class="conversation-thread"></div>
         <div id="judge-section" style="display:none"></div>
         <button id="new-debate-btn">← New debate</button>
       </div>
@@ -618,11 +601,25 @@
     // ── State ──────────────────────────────────────────────────────────
     const PERSONAS = {};
     let selectedRounds = 2;
+    let selectedAgents = 4;
     let shortMode = false;
     let totalSteps = 0;
     let completedSteps = 0;
     let currentSource = null;
     let debateCompleted = false;
+    let currentActiveCard = null; // { card, bodyEl, cursorEl, text }
+
+    // ── Agent selector ─────────────────────────────────────────────────
+    const agentLabels = { 2: 'Two', 4: 'Four' };
+
+    document.querySelectorAll('.agent-opt').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.agent-opt').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        selectedAgents = parseInt(btn.dataset.val);
+        document.getElementById('agent-count-label').textContent = agentLabels[selectedAgents] || 'Four';
+      });
+    });
 
     // ── Round selector ─────────────────────────────────────────────────
     document.querySelectorAll('.round-opt').forEach(btn => {
@@ -636,7 +633,10 @@
     // ── Shorter toggle ─────────────────────────────────────────────────
     document.getElementById('shorter-toggle').addEventListener('click', () => {
       shortMode = !shortMode;
-      document.getElementById('shorter-toggle').classList.toggle('active', shortMode);
+      const btn = document.getElementById('shorter-toggle');
+      btn.classList.toggle('active', shortMode);
+      btn.classList.toggle('active-teal', shortMode);
+      btn.classList.toggle('active', shortMode);
     });
 
     // ── Example chips ──────────────────────────────────────────────────
@@ -646,7 +646,7 @@
       });
     });
 
-    // ── Start debate ───────────────────────────────────────────────────
+    // ── Start / reset ──────────────────────────────────────────────────
     document.getElementById('start-btn').addEventListener('click', startDebate);
     document.getElementById('topic-input').addEventListener('keydown', e => {
       if (e.key === 'Enter') startDebate();
@@ -657,9 +657,10 @@
       document.getElementById('arena').style.display = 'none';
       document.getElementById('intro').style.display = 'flex';
       document.getElementById('new-debate-btn').style.display = 'none';
-      document.getElementById('rounds-container').innerHTML = '';
+      document.getElementById('conversation-thread').innerHTML = '';
       document.getElementById('judge-section').style.display = 'none';
       document.getElementById('judge-section').innerHTML = '';
+      currentActiveCard = null;
       setStatus('Ready.');
       setProgress(0);
     });
@@ -672,24 +673,21 @@
       document.getElementById('arena').style.display = 'block';
       document.getElementById('arena-topic').textContent = `"${topic}"`;
       document.getElementById('arena-badge').textContent = 'connecting…';
-      document.getElementById('rounds-container').innerHTML = '';
+      document.getElementById('conversation-thread').innerHTML = '';
       document.getElementById('judge-section').style.display = 'none';
       document.getElementById('new-debate-btn').style.display = 'none';
-
+      currentActiveCard = null;
       debateCompleted = false;
-      const url = `/api/debate?topic=${encodeURIComponent(topic)}&num_rounds=${selectedRounds}${shortMode ? '&short=true' : ''}`;
-      currentSource = new EventSource(url);
 
+      const url = `/api/debate?topic=${encodeURIComponent(topic)}&num_rounds=${selectedRounds}&num_agents=${selectedAgents}${shortMode ? '&short=true' : ''}`;
+      currentSource = new EventSource(url);
       currentSource.onmessage = handleEvent;
-      currentSource.onerror = (e) => {
+      currentSource.onerror = () => {
         if (debateCompleted) return;
         const state = currentSource.readyState;
-        console.error('[SSE] onerror fired. readyState:', state, 'event:', e);
-        if (state === EventSource.CONNECTING) {
-          setStatus('Connection error — server unreachable or stream dropped. Check console.');
-        } else {
-          setStatus('Connection error. Please try again.');
-        }
+        setStatus(state === EventSource.CONNECTING
+          ? 'Connection error — server unreachable or stream dropped.'
+          : 'Connection error. Please try again.');
         document.getElementById('arena-badge').textContent = 'error';
         document.getElementById('new-debate-btn').style.display = 'block';
         currentSource.close();
@@ -697,8 +695,6 @@
     }
 
     // ── Event handler ──────────────────────────────────────────────────
-    const cardMap = {}; // persona_id → { card, bodyEl, cursorEl }
-
     function handleEvent(e) {
       const ev = JSON.parse(e.data);
 
@@ -718,16 +714,16 @@
           break;
 
         case 'agent_start':
-          activateCard(ev.persona_id, ev.round);
+          createTurnCard(ev);
           setStatus(`${ev.persona_name} — ${ev.persona_role} is arguing…`);
           break;
 
         case 'agent_token':
-          appendToken(ev.persona_id, ev.token);
+          appendToken(ev.token);
           break;
 
         case 'agent_end':
-          deactivateCard(ev.persona_id);
+          deactivateCurrentCard();
           completedSteps++;
           setProgress(completedSteps / totalSteps);
           break;
@@ -753,7 +749,7 @@
 
         case 'debate_end':
           debateCompleted = true;
-          setStatus(`Debate complete — ${ev.total_arguments} arguments across ${selectedRounds} round${selectedRounds > 1 ? 's' : ''}.`);
+          setStatus(`Debate complete — ${ev.total_arguments} argument${ev.total_arguments !== 1 ? 's' : ''} across ${selectedRounds} round${selectedRounds > 1 ? 's' : ''}.`);
           document.getElementById('arena-badge').textContent = 'complete';
           document.getElementById('new-debate-btn').style.display = 'block';
           currentSource.close();
@@ -768,105 +764,76 @@
     }
 
     // ── DOM helpers ────────────────────────────────────────────────────
-    let currentGridEl = null;
-
     function addRoundHeader(round, total) {
-      const container = document.getElementById('rounds-container');
-
+      const thread = document.getElementById('conversation-thread');
       const header = document.createElement('div');
       header.className = 'round-header';
+      header.style.marginTop = round === 1 ? '0' : '32px';
       header.innerHTML = `
         <span class="round-label">Round ${round}</span>
         <span class="round-line"></span>
       `;
-      container.appendChild(header);
-
-      const grid = document.createElement('div');
-      grid.className = 'debaters-grid';
-      grid.id = `grid-round-${round}`;
-      container.appendChild(grid);
-      currentGridEl = grid;
-
-      // Pre-create all 4 debater cards (they'll be populated on agent_start)
+      thread.appendChild(header);
     }
 
-    function getOrCreateCard(personaId, round) {
-      const key = `${personaId}-r${round}`;
-      if (cardMap[key]) return cardMap[key];
+    function createTurnCard(ev) {
+      const thread = document.getElementById('conversation-thread');
+      const p = PERSONAS[ev.persona_id];
+      if (!p) return;
 
-      const grid = document.getElementById(`grid-round-${round}`);
-      if (!grid) return null;
-
-      const p = PERSONAS[personaId];
-      if (!p) return null;
-
+      const uid = `turn-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`;
       const card = document.createElement('div');
-      card.className = 'debater-card';
-      card.id = `card-${key}`;
+      card.className = 'turn-card speaking';
       card.style.setProperty('--card-color', p.color);
       card.style.borderLeftColor = p.color;
-      card.style.animationDelay = `${Object.keys(cardMap).length * 0.07}s`;
 
       card.innerHTML = `
-        <div class="card-header">
-          <div class="card-avatar">${p.emoji}</div>
-          <div class="card-meta">
-            <div class="card-name">${p.name}</div>
-            <div class="card-role" style="color:${p.color}">${p.role}</div>
+        <div class="turn-header">
+          <div class="turn-avatar">${p.emoji}</div>
+          <div class="turn-meta">
+            <div class="turn-name">${p.name}</div>
+            <div class="turn-role" style="color:${p.color}">${p.role}</div>
           </div>
-          <div class="card-status">
+          <div class="turn-status">
             <span class="status-dot" style="color:${p.color}"></span>
-            <span class="status-label">waiting</span>
+            <span class="status-label">speaking</span>
           </div>
         </div>
-        <div class="card-body" id="body-${key}"><span class="cursor hidden"></span></div>
+        <div class="turn-body" id="body-${uid}"><span class="cursor" id="cursor-${uid}"></span></div>
       `;
 
-      grid.appendChild(card);
+      thread.appendChild(card);
+      thread.classList.add('has-active');
+      card.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
 
-      const bodyEl = card.querySelector(`#body-${key}`);
-      const cursorEl = card.querySelector('.cursor');
-
-      cardMap[key] = { card, bodyEl, cursorEl, text: '' };
-      return cardMap[key];
+      currentActiveCard = {
+        card,
+        bodyEl: document.getElementById(`body-${uid}`),
+        cursorEl: document.getElementById(`cursor-${uid}`),
+        text: '',
+      };
     }
 
-    function activateCard(personaId, round) {
-      const entry = getOrCreateCard(personaId, round);
-      if (!entry) return;
-      entry.card.classList.add('speaking');
-      entry.card.querySelector('.status-label').textContent = 'speaking';
-      entry.cursorEl.classList.remove('hidden');
-      const grid = entry.card.closest('.debaters-grid');
-      if (grid) grid.classList.add('has-active');
+    function appendToken(token) {
+      if (!currentActiveCard) return;
+      currentActiveCard.text += token;
+      currentActiveCard.bodyEl.classList.add('has-text');
+      currentActiveCard.bodyEl.textContent = currentActiveCard.text;
+      currentActiveCard.bodyEl.appendChild(currentActiveCard.cursorEl);
     }
 
-    function appendToken(personaId, token) {
-      // Find the most recent card for this persona
-      const keys = Object.keys(cardMap).filter(k => k.startsWith(personaId + '-'));
-      const key = keys[keys.length - 1];
-      if (!key) return;
-      const entry = cardMap[key];
-      entry.text += token;
-      // Remove cursor, set text, re-add cursor
-      entry.bodyEl.classList.add('has-text');
-      entry.bodyEl.textContent = entry.text;
-      entry.bodyEl.appendChild(entry.cursorEl);
+    function deactivateCurrentCard() {
+      if (!currentActiveCard) return;
+      const { card, cursorEl } = currentActiveCard;
+      card.classList.remove('speaking');
+      card.classList.add('done');
+      card.querySelector('.status-label').textContent = 'done';
+      cursorEl.classList.add('hidden');
+      document.getElementById('conversation-thread').classList.remove('has-active');
+      currentActiveCard = null;
     }
 
-    function deactivateCard(personaId) {
-      const keys = Object.keys(cardMap).filter(k => k.startsWith(personaId + '-'));
-      const key = keys[keys.length - 1];
-      if (!key) return;
-      const entry = cardMap[key];
-      entry.card.classList.remove('speaking');
-      entry.card.classList.add('done');
-      entry.card.querySelector('.status-label').textContent = 'done';
-      entry.cursorEl.classList.add('hidden');
-      const grid = entry.card.closest('.debaters-grid');
-      if (grid) grid.classList.remove('has-active');
-    }
-
+    // ── Judge ──────────────────────────────────────────────────────────
     let judgeBodyEl = null;
     let judgeCursorEl = null;
     let judgeText = '';
@@ -876,9 +843,8 @@
       section.style.display = 'block';
       section.style.animation = 'none';
       section.offsetHeight; // reflow
-      section.style.animation = '';
-      section.style.opacity = '0';
       section.style.animation = 'fadeSlideIn 0.5s ease forwards';
+      section.style.opacity = '0';
 
       section.innerHTML = `
         <div class="judge-header">
@@ -898,7 +864,6 @@
     function appendJudgeToken(token) {
       if (!judgeBodyEl) return;
       judgeText += token;
-      // Render markdown-lite: bold
       const rendered = judgeText
         .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
         .replace(/\n\n/g, '<br><br>');
@@ -910,7 +875,6 @@
       if (judgeCursorEl) judgeCursorEl.classList.add('hidden');
     }
 
-
     // ── Utilities ──────────────────────────────────────────────────────
     function setStatus(msg) {
       document.getElementById('status-text').textContent = msg;
@@ -921,7 +885,6 @@
     }
 
     function shake(el) {
-      el.style.animation = 'none';
       el.style.borderColor = 'var(--coral)';
       setTimeout(() => { el.style.borderColor = ''; }, 800);
     }

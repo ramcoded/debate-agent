@@ -21,18 +21,25 @@ async def stream_argument(
 
     brevity = "Be concise — 2 to 3 sentences maximum. " if short else ""
 
-    if round_num == 1:
+    if round_num == 1 and not history:
         prompt = (
             f"The debate topic is: **{topic}**\n\n"
-            f"{brevity}Present your opening argument. Be direct, specific, and establish your position immediately."
+            f"{brevity}You are opening the debate. Present your position directly and establish your stance immediately."
+        )
+    elif round_num == 1:
+        last = history[-1]
+        prompt = (
+            f"The debate topic is: **{topic}**\n\n"
+            f"{brevity}{last.persona_name} just argued their position. "
+            "Respond directly to their argument, then state your own case clearly."
             f"{context_block}"
         )
     else:
+        last = history[-1]
         prompt = (
             f"The debate topic is: **{topic}**\n\n"
-            f"Round {round_num} — {brevity}Respond to the arguments made so far. "
-            "Address specific points made by other debaters by name. "
-            "Advance your position, challenge theirs, and sharpen your argument."
+            f"Round {round_num} — {brevity}Address {last.persona_name}'s most recent argument directly. "
+            "Push back on their specific claims, then sharpen your own position."
             f"{context_block}"
         )
 
