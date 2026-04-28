@@ -77,7 +77,6 @@
       letter-spacing: 0.05em;
     }
 
-    /* ── Stage ── */
     #stage { width: 100%; max-width: 860px; }
 
     /* ── Intro ── */
@@ -108,10 +107,7 @@
       margin-bottom: 16px;
     }
 
-    .intro-title em {
-      font-style: italic;
-      color: var(--text-muted);
-    }
+    .intro-title em { font-style: italic; color: var(--text-muted); }
 
     .intro-sub {
       font-size: 15px;
@@ -129,11 +125,7 @@
       gap: 12px;
     }
 
-    .input-row {
-      display: flex;
-      gap: 12px;
-      width: 100%;
-    }
+    .input-row { display: flex; gap: 12px; width: 100%; }
 
     #topic-input {
       flex: 1;
@@ -169,7 +161,6 @@
     #start-btn:active { transform: translateY(0); }
     #start-btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
 
-    /* ── Options row ── */
     .options-row {
       display: flex;
       align-items: center;
@@ -203,25 +194,10 @@
     }
 
     .opt-btn:hover { border-color: var(--border-bright); color: var(--text); }
+    .opt-btn.active { background: var(--surface-2); border-color: var(--border-bright); color: var(--text); }
+    .opt-btn.active-accent { background: var(--surface-2); border-color: var(--teal); color: var(--teal); }
 
-    .opt-btn.active {
-      background: var(--surface-2);
-      border-color: var(--border-bright);
-      color: var(--text);
-    }
-
-    .opt-btn.active-teal {
-      background: var(--surface-2);
-      border-color: var(--teal);
-      color: var(--teal);
-    }
-
-    .opt-divider {
-      width: 1px;
-      height: 18px;
-      background: var(--border);
-      margin: 0 2px;
-    }
+    .opt-divider { width: 1px; height: 18px; background: var(--border); margin: 0 2px; }
 
     .example-topics {
       display: flex;
@@ -243,10 +219,7 @@
       transition: all 0.15s;
     }
 
-    .example-chip:hover {
-      border-color: var(--border-bright);
-      color: var(--text);
-    }
+    .example-chip:hover { border-color: var(--border-bright); color: var(--text); }
 
     /* ── Arena ── */
     #arena { display: none; }
@@ -286,9 +259,9 @@
       display: flex;
       align-items: center;
       gap: 16px;
-      margin-bottom: 16px;
+      margin-bottom: 12px;
       opacity: 0;
-      animation: fadeSlideIn 0.4s ease forwards;
+      animation: fadeUp 0.35s ease forwards;
     }
 
     .round-label {
@@ -309,107 +282,151 @@
       gap: 10px;
     }
 
+    /* dim done cards while someone speaks */
+    .conversation-thread.has-active .turn-card.done {
+      opacity: 0.38;
+      transition: opacity 0.3s ease;
+    }
+
     /* ── Turn card ── */
     .turn-card {
       background: var(--surface);
       border: 1px solid var(--border);
+      border-left: 3px solid var(--card-color, transparent);
       border-radius: 8px;
-      padding: 20px 22px 22px;
-      border-left: 3px solid transparent;
+      padding: 18px 22px 20px;
       opacity: 0;
-      animation: fadeSlideIn 0.35s ease forwards;
-      transition: background 0.3s, box-shadow 0.3s, opacity 0.35s ease, filter 0.35s ease, transform 0.35s ease;
+      animation: cardPunchIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+      transition: background 0.3s, box-shadow 0.3s, opacity 0.3s;
     }
 
     .turn-card.speaking {
       background: var(--surface-2);
-      box-shadow: 0 0 0 1px var(--card-color, #fff) inset, 0 8px 32px rgba(0,0,0,0.3);
-      transform: scale(1.008);
-      position: relative;
-      z-index: 1;
+      box-shadow: 0 0 0 1px var(--card-color, transparent) inset,
+                  0 12px 40px rgba(0,0,0,0.35);
     }
 
-    .turn-card.done { opacity: 0.82; }
+    .turn-card.done { opacity: 0.85; }
 
-    /* Dim non-speaking cards while one is active */
-    .conversation-thread.has-active .turn-card:not(.speaking) {
-      opacity: 0.28;
-      filter: blur(0.5px);
-      transform: scale(0.998);
+    /* ── Portrait section (visible when speaking) ── */
+    .card-portrait {
+      text-align: center;
+      padding: 24px 0 18px;
+      max-height: 260px;
+      opacity: 1;
+      overflow: hidden;
+      transition: max-height 0.4s ease, opacity 0.3s ease, padding 0.4s ease;
     }
 
-    .turn-header {
-      display: flex;
-      align-items: flex-start;
-      gap: 12px;
+    .turn-card.done .card-portrait {
+      max-height: 0;
+      opacity: 0;
+      padding: 0;
+      pointer-events: none;
+    }
+
+    .portrait-emoji {
+      font-size: 80px;
+      line-height: 1;
+      display: block;
+      margin-bottom: 14px;
+      animation: portraitBob 0.55s ease-in-out infinite alternate;
+      filter: drop-shadow(0 4px 12px rgba(0,0,0,0.4));
+    }
+
+    .portrait-name {
+      font-family: 'Playfair Display', serif;
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 4px;
+    }
+
+    .portrait-role {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
       margin-bottom: 14px;
     }
 
-    .turn-avatar {
-      width: 38px; height: 38px;
-      border-radius: 50%;
-      display: flex;
+    .portrait-status {
+      display: inline-flex;
       align-items: center;
-      justify-content: center;
-      font-size: 18px;
-      flex-shrink: 0;
-      background: rgba(255,255,255,0.05);
-    }
-
-    .turn-meta { flex: 1; min-width: 0; }
-
-    .turn-name {
-      font-family: 'Playfair Display', serif;
-      font-size: 15px;
-      font-weight: 700;
-      color: var(--text);
-      line-height: 1.2;
-    }
-
-    .turn-role {
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 10px;
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-      margin-top: 3px;
-    }
-
-    .turn-status {
+      gap: 6px;
       font-family: 'JetBrains Mono', monospace;
       font-size: 10px;
       color: var(--text-dim);
-      display: flex;
-      align-items: center;
-      gap: 5px;
+      letter-spacing: 0.08em;
     }
 
     .status-dot {
       width: 6px; height: 6px;
       border-radius: 50%;
-      background: var(--text-dim);
-      transition: background 0.3s;
+      background: var(--card-color, var(--text-dim));
+      animation: blinkDot 0.8s ease infinite;
     }
 
-    .speaking .status-dot {
-      background: currentColor;
-      animation: blink-dot 0.8s ease infinite;
+    /* ── Compact header (visible when done) ── */
+    .card-compact {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      height: 0;
+      overflow: hidden;
+      opacity: 0;
+      transition: height 0.35s ease 0.12s, opacity 0.3s ease 0.18s, margin-bottom 0.35s ease 0.12s;
+      margin-bottom: 0;
     }
 
-    .turn-body {
-      font-size: 13.5px;
-      line-height: 1.75;
+    .turn-card.done .card-compact {
+      height: 28px;
+      opacity: 1;
+      margin-bottom: 8px;
+    }
+
+    .compact-emoji { font-size: 17px; line-height: 1; }
+
+    .compact-name {
+      font-family: 'Playfair Display', serif;
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--text);
+    }
+
+    .compact-sep { color: var(--text-dim); font-size: 11px; margin: 0 1px; }
+
+    .compact-role {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    /* ── Card text ── */
+    .card-text {
+      font-size: 14px;
+      line-height: 1.78;
       color: var(--text-muted);
+      border-top: 1px solid var(--border);
+      padding-top: 14px;
     }
 
-    .turn-body.has-text { color: var(--text); }
+    .turn-card.speaking .card-text {
+      font-size: 16px;
+      color: var(--text);
+      border-top-color: var(--border-bright);
+    }
+
+    .card-text.has-text { color: var(--text); }
 
     .cursor {
       display: inline-block;
-      width: 2px; height: 14px;
+      width: 2px; height: 15px;
       background: var(--text-muted);
-      margin-left: 1px;
+      margin-left: 2px;
       vertical-align: middle;
-      animation: blink-cursor 0.6s step-end infinite;
+      animation: blinkCursor 0.55s step-end infinite;
     }
 
     .cursor.hidden { display: none; }
@@ -418,7 +435,7 @@
     #judge-section {
       margin-top: 48px;
       opacity: 0;
-      animation: fadeSlideIn 0.5s ease forwards;
+      animation: fadeUp 0.5s ease forwards;
     }
 
     .judge-header {
@@ -447,12 +464,7 @@
       padding: 28px 32px;
     }
 
-    .judge-verdict {
-      font-size: 15px;
-      line-height: 1.8;
-      color: var(--text);
-    }
-
+    .judge-verdict { font-size: 15px; line-height: 1.8; color: var(--text); }
     .judge-verdict strong { color: var(--gold); font-weight: 500; }
 
     /* ── Status bar ── */
@@ -476,20 +488,8 @@
       flex: 1;
     }
 
-    .progress-track {
-      width: 120px; height: 2px;
-      background: var(--border);
-      border-radius: 1px;
-      overflow: hidden;
-    }
-
-    .progress-fill {
-      height: 100%;
-      background: var(--text-muted);
-      width: 0%;
-      transition: width 0.4s ease;
-      border-radius: 1px;
-    }
+    .progress-track { width: 120px; height: 2px; background: var(--border); border-radius: 1px; overflow: hidden; }
+    .progress-fill { height: 100%; background: var(--text-muted); width: 0%; transition: width 0.4s ease; border-radius: 1px; }
 
     /* ── New debate button ── */
     #new-debate-btn {
@@ -508,24 +508,75 @@
 
     #new-debate-btn:hover { color: var(--text); border-color: var(--text-muted); }
 
+    /* ── OBJECTION overlay ── */
+    #objection-overlay {
+      position: fixed;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      pointer-events: none;
+      z-index: 999;
+    }
+
+    .objection-word {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(58px, 10vw, 108px);
+      font-weight: 900;
+      font-style: italic;
+      letter-spacing: -0.02em;
+      opacity: 0;
+      user-select: none;
+      display: none;
+    }
+
+    .objection-word.bang {
+      display: block;
+      animation: pwBang 1.05s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+
     /* ── Animations ── */
-    @keyframes fadeSlideIn {
-      from { opacity: 0; transform: translateY(12px); }
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(10px); }
       to   { opacity: 1; transform: translateY(0); }
     }
 
-    @keyframes blink-cursor {
+    @keyframes cardPunchIn {
+      0%   { opacity: 0; transform: translateY(18px) scale(0.97); }
+      55%  { transform: translateY(-3px) scale(1.005); }
+      100% { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    @keyframes portraitBob {
+      from { transform: translateY(0px); }
+      to   { transform: translateY(-10px); }
+    }
+
+    @keyframes blinkCursor {
       0%, 100% { opacity: 1; }
       50%       { opacity: 0; }
     }
 
-    @keyframes blink-dot {
+    @keyframes blinkDot {
       0%, 100% { opacity: 1; }
       50%       { opacity: 0.2; }
+    }
+
+    @keyframes pwBang {
+      0%   { opacity: 0;   transform: scale(0.12) rotate(-14deg); filter: blur(6px); }
+      22%  { opacity: 1;   transform: scale(1.22) rotate(-2deg);  filter: blur(0); }
+      42%  { transform: scale(0.97) rotate(0deg); }
+      68%  { opacity: 1;   transform: scale(1) rotate(0deg); }
+      100% { opacity: 0;   transform: scale(0.93) rotate(1deg); }
     }
   </style>
 </head>
 <body>
+  <!-- Phoenix Wright OBJECTION overlay -->
+  <div id="objection-overlay">
+    <span class="objection-word" id="objection-word">OBJECTION!</span>
+  </div>
+
   <div class="page">
     <header>
       <span class="logo">Debate Arena</span>
@@ -564,7 +615,7 @@
               <button class="opt-btn round-opt" data-val="3">3</button>
             </div>
             <div class="opt-divider"></div>
-            <button id="shorter-toggle" class="opt-btn" title="Shorter agent responses">concise</button>
+            <button id="shorter-toggle" class="opt-btn" title="Shorter responses">concise</button>
           </div>
         </div>
 
@@ -608,6 +659,7 @@
     let currentSource = null;
     let debateCompleted = false;
     let currentActiveCard = null; // { card, bodyEl, cursorEl, text }
+    let speakersThisDebate = 0;   // how many agent_start events have fired
 
     // ── Agent selector ─────────────────────────────────────────────────
     const agentLabels = { 2: 'Two', 4: 'Four' };
@@ -630,13 +682,12 @@
       });
     });
 
-    // ── Shorter toggle ─────────────────────────────────────────────────
+    // ── Concise toggle ─────────────────────────────────────────────────
     document.getElementById('shorter-toggle').addEventListener('click', () => {
       shortMode = !shortMode;
       const btn = document.getElementById('shorter-toggle');
       btn.classList.toggle('active', shortMode);
-      btn.classList.toggle('active-teal', shortMode);
-      btn.classList.toggle('active', shortMode);
+      btn.classList.toggle('active-accent', shortMode);
     });
 
     // ── Example chips ──────────────────────────────────────────────────
@@ -661,6 +712,7 @@
       document.getElementById('judge-section').style.display = 'none';
       document.getElementById('judge-section').innerHTML = '';
       currentActiveCard = null;
+      speakersThisDebate = 0;
       setStatus('Ready.');
       setProgress(0);
     });
@@ -677,6 +729,7 @@
       document.getElementById('judge-section').style.display = 'none';
       document.getElementById('new-debate-btn').style.display = 'none';
       currentActiveCard = null;
+      speakersThisDebate = 0;
       debateCompleted = false;
 
       const url = `/api/debate?topic=${encodeURIComponent(topic)}&num_rounds=${selectedRounds}&num_agents=${selectedAgents}${shortMode ? '&short=true' : ''}`;
@@ -684,8 +737,7 @@
       currentSource.onmessage = handleEvent;
       currentSource.onerror = () => {
         if (debateCompleted) return;
-        const state = currentSource.readyState;
-        setStatus(state === EventSource.CONNECTING
+        setStatus(currentSource.readyState === EventSource.CONNECTING
           ? 'Connection error — server unreachable or stream dropped.'
           : 'Connection error. Please try again.');
         document.getElementById('arena-badge').textContent = 'error';
@@ -701,7 +753,7 @@
       switch (ev.type) {
         case 'debate_start':
           ev.personas.forEach(p => { PERSONAS[p.id] = p; });
-          totalSteps = ev.num_rounds * ev.personas.length + 1; // +1 for judge
+          totalSteps = ev.num_rounds * ev.personas.length + 1;
           completedSteps = 0;
           document.getElementById('arena-badge').textContent = 'round 1 of ' + ev.num_rounds;
           setStatus('Debate starting…');
@@ -713,10 +765,14 @@
           addRoundHeader(ev.round, ev.total_rounds);
           break;
 
-        case 'agent_start':
+        case 'agent_start': {
+          const banner = pickBanner(ev.persona_id, ev.round);
+          if (banner) flashBanner(banner);
           createTurnCard(ev);
+          speakersThisDebate++;
           setStatus(`${ev.persona_name} — ${ev.persona_role} is arguing…`);
           break;
+        }
 
         case 'agent_token':
           appendToken(ev.token);
@@ -763,16 +819,42 @@
       }
     }
 
+    // ── OBJECTION banner ───────────────────────────────────────────────
+    const bannerConfig = {
+      objection: { text: 'OBJECTION!',   color: '#ff4040', shadow: '4px 4px 0 #880000, -1px -1px 0 rgba(255,255,255,0.15)' },
+      holdit:    { text: 'HOLD IT!',     color: '#ffe66d', shadow: '4px 4px 0 #665500, -1px -1px 0 rgba(255,255,255,0.1)' },
+      takethat:  { text: 'TAKE THAT!',   color: '#4ecdc4', shadow: '4px 4px 0 #1a6660, -1px -1px 0 rgba(255,255,255,0.1)' },
+    };
+
+    function pickBanner(personaId, round) {
+      if (speakersThisDebate === 0) return null; // very first speaker ever — no banner
+      if (personaId === 'devil') return 'objection';
+      if (round > 1) return personaId === 'visionary' ? 'takethat' : 'holdit';
+      return 'holdit'; // round 1, not first speaker
+    }
+
+    let bannerTimer = null;
+    function flashBanner(type) {
+      const cfg = bannerConfig[type];
+      if (!cfg) return;
+      const el = document.getElementById('objection-word');
+      el.textContent = cfg.text;
+      el.style.color = cfg.color;
+      el.style.textShadow = cfg.shadow;
+      el.classList.remove('bang');
+      el.offsetHeight; // reflow
+      el.classList.add('bang');
+      clearTimeout(bannerTimer);
+      bannerTimer = setTimeout(() => el.classList.remove('bang'), 1100);
+    }
+
     // ── DOM helpers ────────────────────────────────────────────────────
     function addRoundHeader(round, total) {
       const thread = document.getElementById('conversation-thread');
       const header = document.createElement('div');
       header.className = 'round-header';
-      header.style.marginTop = round === 1 ? '0' : '32px';
-      header.innerHTML = `
-        <span class="round-label">Round ${round}</span>
-        <span class="round-line"></span>
-      `;
+      header.style.marginTop = round === 1 ? '0' : '28px';
+      header.innerHTML = `<span class="round-label">Round ${round}</span><span class="round-line"></span>`;
       thread.appendChild(header);
     }
 
@@ -781,35 +863,39 @@
       const p = PERSONAS[ev.persona_id];
       if (!p) return;
 
-      const uid = `turn-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`;
+      const uid = `t${Date.now().toString(36)}`;
       const card = document.createElement('div');
       card.className = 'turn-card speaking';
       card.style.setProperty('--card-color', p.color);
-      card.style.borderLeftColor = p.color;
 
       card.innerHTML = `
-        <div class="turn-header">
-          <div class="turn-avatar">${p.emoji}</div>
-          <div class="turn-meta">
-            <div class="turn-name">${p.name}</div>
-            <div class="turn-role" style="color:${p.color}">${p.role}</div>
-          </div>
-          <div class="turn-status">
-            <span class="status-dot" style="color:${p.color}"></span>
-            <span class="status-label">speaking</span>
+        <div class="card-portrait">
+          <span class="portrait-emoji">${p.emoji}</span>
+          <div class="portrait-name">${p.name}</div>
+          <div class="portrait-role" style="color:${p.color}">${p.role}</div>
+          <div class="portrait-status">
+            <span class="status-dot"></span>
+            <span>speaking</span>
           </div>
         </div>
-        <div class="turn-body" id="body-${uid}"><span class="cursor" id="cursor-${uid}"></span></div>
+        <div class="card-compact">
+          <span class="compact-emoji">${p.emoji}</span>
+          <span class="compact-name">${p.name}</span>
+          <span class="compact-sep">·</span>
+          <span class="compact-role" style="color:${p.color}">${p.role}</span>
+        </div>
+        <div class="card-text" id="ct-${uid}"><span class="cursor" id="cc-${uid}"></span></div>
       `;
 
       thread.appendChild(card);
       thread.classList.add('has-active');
-      card.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      // slight delay so the OBJECTION banner is visible before card punches in
+      setTimeout(() => card.scrollIntoView({ behavior: 'smooth', block: 'nearest' }), 120);
 
       currentActiveCard = {
         card,
-        bodyEl: document.getElementById(`body-${uid}`),
-        cursorEl: document.getElementById(`cursor-${uid}`),
+        bodyEl: document.getElementById(`ct-${uid}`),
+        cursorEl: document.getElementById(`cc-${uid}`),
         text: '',
       };
     }
@@ -827,25 +913,21 @@
       const { card, cursorEl } = currentActiveCard;
       card.classList.remove('speaking');
       card.classList.add('done');
-      card.querySelector('.status-label').textContent = 'done';
       cursorEl.classList.add('hidden');
       document.getElementById('conversation-thread').classList.remove('has-active');
       currentActiveCard = null;
     }
 
     // ── Judge ──────────────────────────────────────────────────────────
-    let judgeBodyEl = null;
-    let judgeCursorEl = null;
-    let judgeText = '';
+    let judgeBodyEl = null, judgeCursorEl = null, judgeText = '';
 
     function showJudgeSection() {
       const section = document.getElementById('judge-section');
       section.style.display = 'block';
       section.style.animation = 'none';
-      section.offsetHeight; // reflow
-      section.style.animation = 'fadeSlideIn 0.5s ease forwards';
+      section.offsetHeight;
       section.style.opacity = '0';
-
+      section.style.animation = 'fadeUp 0.5s ease forwards';
       section.innerHTML = `
         <div class="judge-header">
           <span class="judge-title">⚖ Judge's Verdict</span>
@@ -855,7 +937,6 @@
           <div class="judge-verdict" id="judge-body"><span class="cursor" id="judge-cursor"></span></div>
         </div>
       `;
-
       judgeBodyEl = document.getElementById('judge-body');
       judgeCursorEl = document.getElementById('judge-cursor');
       judgeText = '';
@@ -864,10 +945,9 @@
     function appendJudgeToken(token) {
       if (!judgeBodyEl) return;
       judgeText += token;
-      const rendered = judgeText
+      judgeBodyEl.innerHTML = judgeText
         .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
         .replace(/\n\n/g, '<br><br>');
-      judgeBodyEl.innerHTML = rendered;
       judgeBodyEl.appendChild(judgeCursorEl);
     }
 
@@ -876,14 +956,8 @@
     }
 
     // ── Utilities ──────────────────────────────────────────────────────
-    function setStatus(msg) {
-      document.getElementById('status-text').textContent = msg;
-    }
-
-    function setProgress(ratio) {
-      document.getElementById('progress-fill').style.width = `${Math.min(ratio * 100, 100)}%`;
-    }
-
+    function setStatus(msg) { document.getElementById('status-text').textContent = msg; }
+    function setProgress(r) { document.getElementById('progress-fill').style.width = `${Math.min(r * 100, 100)}%`; }
     function shake(el) {
       el.style.borderColor = 'var(--coral)';
       setTimeout(() => { el.style.borderColor = ''; }, 800);

@@ -45,7 +45,7 @@ async def stream_argument(
 
     stream = await _client.chat.completions.create(
         model="llama-3.1-8b-instant",
-        max_tokens=120 if short else 350,
+        max_tokens=50 if short else 90,
         messages=[
             {"role": "system", "content": persona.system_prompt},
             {"role": "user", "content": prompt},
