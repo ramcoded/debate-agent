@@ -282,7 +282,6 @@
       gap: 10px;
     }
 
-    /* dim done cards while someone speaks */
     .conversation-thread.has-active .turn-card.done {
       opacity: 0.38;
       transition: opacity 0.3s ease;
@@ -308,7 +307,7 @@
 
     .turn-card.done { opacity: 0.85; }
 
-    /* ── Portrait section (visible when speaking) ── */
+    /* ── Portrait (visible while speaking, collapses when done) ── */
     .card-portrait {
       text-align: center;
       padding: 24px 0 18px;
@@ -367,7 +366,7 @@
       animation: blinkDot 0.8s ease infinite;
     }
 
-    /* ── Compact header (visible when done) ── */
+    /* ── Compact header (hidden while speaking, shown when done) ── */
     .card-compact {
       display: flex;
       align-items: center;
@@ -403,7 +402,7 @@
       text-transform: uppercase;
     }
 
-    /* ── Card text ── */
+    /* ── Dialogue text ── */
     .card-text {
       font-size: 14px;
       line-height: 1.78;
@@ -420,6 +419,7 @@
 
     .card-text.has-text { color: var(--text); }
 
+    /* Blinking cursor */
     .cursor {
       display: inline-block;
       width: 2px; height: 15px;
@@ -490,6 +490,20 @@
 
     .progress-track { width: 120px; height: 2px; background: var(--border); border-radius: 1px; overflow: hidden; }
     .progress-fill { height: 100%; background: var(--text-muted); width: 0%; transition: width 0.4s ease; border-radius: 1px; }
+
+    #sound-btn {
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-size: 14px;
+      opacity: 0.45;
+      padding: 0;
+      transition: opacity 0.15s;
+      line-height: 1;
+    }
+
+    #sound-btn:hover { opacity: 0.9; }
+    #sound-btn.muted { opacity: 0.18; }
 
     /* ── New debate button ── */
     #new-debate-btn {
@@ -572,7 +586,6 @@
   </style>
 </head>
 <body>
-  <!-- Phoenix Wright OBJECTION overlay -->
   <div id="objection-overlay">
     <span class="objection-word" id="objection-word">OBJECTION!</span>
   </div>
@@ -585,7 +598,6 @@
     </header>
 
     <div id="stage">
-      <!-- Intro / form -->
       <div id="intro">
         <div class="intro-eyebrow">Multi-Agent Intelligence</div>
         <h1 class="intro-title"><span id="agent-count-label">Four</span> Minds.<br><em>One Verdict.</em></h1>
@@ -593,12 +605,9 @@
 
         <div class="form-wrap">
           <div class="input-row">
-            <input
-              id="topic-input"
-              type="text"
+            <input id="topic-input" type="text"
               placeholder="e.g. Should AI systems have legal personhood?"
-              autocomplete="off"
-            />
+              autocomplete="off" />
             <button id="start-btn">Begin →</button>
           </div>
           <div class="options-row">
@@ -628,7 +637,6 @@
         </div>
       </div>
 
-      <!-- Arena -->
       <div id="arena">
         <div class="arena-header">
           <div class="arena-topic" id="arena-topic"></div>
@@ -646,10 +654,11 @@
     <div class="progress-track">
       <div class="progress-fill" id="progress-fill"></div>
     </div>
+    <button id="sound-btn" title="Toggle typing sounds">🔊</button>
   </div>
 
   <script>
-    // ── State ──────────────────────────────────────────────────────────
+    // ── App state ──────────────────────────────────────────────────────
     const PERSONAS = {};
     let selectedRounds = 2;
     let selectedAgents = 4;
@@ -658,22 +667,120 @@
     let completedSteps = 0;
     let currentSource = null;
     let debateCompleted = false;
-    let currentActiveCard = null; // { card, bodyEl, cursorEl, text }
-    let speakersThisDebate = 0;   // how many agent_start events have fired
+    let currentActiveCard = null;
+    let speakersThisDebate = 0;
 
-    // ── Agent selector ─────────────────────────────────────────────────
-    const agentLabels = { 2: 'Two', 4: 'Four' };
+    // ── Typewriter state ───────────────────────────────────────────────
+    let typeQueue = '';
+    let typeDisplayed = '';
+    let typeTimeout = null;
+    let typingActive = false;
 
+    // delay per character type (ms)
+    const T_CHAR  = 28;
+    const T_SPACE = 8;
+    const T_COMMA = 110;  // , ; :
+    const T_STOP  = 360;  // . ? ! …
+
+    function startTyping() {
+      typeQueue = '';
+      typeDisplayed = '';
+      typingActive = true;
+      clearTimeout(typeTimeout);
+      typeStep();
+    }
+
+    function typeStep() {
+      if (!typingActive || !currentActiveCard) return;
+
+      if (typeQueue.length === 0) {
+        // wait for more tokens
+        typeTimeout = setTimeout(typeStep, 12);
+        return;
+      }
+
+      const ch = typeQueue[0];
+      typeQueue = typeQueue.slice(1);
+      typeDisplayed += ch;
+
+      const body = currentActiveCard.bodyEl;
+      const cur  = currentActiveCard.cursorEl;
+      body.classList.add('has-text');
+      body.textContent = typeDisplayed;
+      body.appendChild(cur);
+
+      // cursor flash on each character
+      if (ch !== ' ' && ch !== '\n') {
+        cur.style.opacity = '0';
+        requestAnimationFrame(() => { if (cur) cur.style.opacity = '1'; });
+        playBlip('.?!…'.includes(ch));
+      }
+
+      let delay = T_CHAR;
+      if (ch === ' ' || ch === '\n')    delay = T_SPACE;
+      else if ('.?!…'.includes(ch))     delay = T_STOP;
+      else if (',;:'.includes(ch))      delay = T_COMMA;
+
+      typeTimeout = setTimeout(typeStep, delay);
+    }
+
+    function flushTyping() {
+      typingActive = false;
+      clearTimeout(typeTimeout);
+      if (currentActiveCard && typeQueue.length > 0) {
+        typeDisplayed += typeQueue;
+        typeQueue = '';
+        const body = currentActiveCard.bodyEl;
+        const cur  = currentActiveCard.cursorEl;
+        body.classList.add('has-text');
+        body.textContent = typeDisplayed;
+        body.appendChild(cur);
+      }
+    }
+
+    // ── Audio ──────────────────────────────────────────────────────────
+    let audioCtx = null;
+    let soundOn  = true;
+
+    function initAudio() {
+      if (audioCtx) return;
+      try { audioCtx = new (window.AudioContext || window.webkitAudioContext)(); } catch(e) {}
+    }
+
+    function playBlip(isStop = false) {
+      if (!soundOn || !audioCtx) return;
+      try {
+        const osc  = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.type = 'square';
+        osc.frequency.value = isStop ? 380 : 500 + Math.random() * 60;
+        gain.gain.setValueAtTime(0.018, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 0.038);
+        osc.start(audioCtx.currentTime);
+        osc.stop(audioCtx.currentTime + 0.038);
+      } catch(e) {}
+    }
+
+    document.getElementById('sound-btn').addEventListener('click', () => {
+      soundOn = !soundOn;
+      const btn = document.getElementById('sound-btn');
+      btn.textContent = soundOn ? '🔊' : '🔇';
+      btn.classList.toggle('muted', !soundOn);
+    });
+
+    // ── Options ────────────────────────────────────────────────────────
     document.querySelectorAll('.agent-opt').forEach(btn => {
       btn.addEventListener('click', () => {
         document.querySelectorAll('.agent-opt').forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
         selectedAgents = parseInt(btn.dataset.val);
-        document.getElementById('agent-count-label').textContent = agentLabels[selectedAgents] || 'Four';
+        document.getElementById('agent-count-label').textContent =
+          ({ 2: 'Two', 4: 'Four' })[selectedAgents] || 'Four';
       });
     });
 
-    // ── Round selector ─────────────────────────────────────────────────
     document.querySelectorAll('.round-opt').forEach(btn => {
       btn.addEventListener('click', () => {
         document.querySelectorAll('.round-opt').forEach(b => b.classList.remove('active'));
@@ -682,15 +789,12 @@
       });
     });
 
-    // ── Concise toggle ─────────────────────────────────────────────────
     document.getElementById('shorter-toggle').addEventListener('click', () => {
       shortMode = !shortMode;
-      const btn = document.getElementById('shorter-toggle');
-      btn.classList.toggle('active', shortMode);
-      btn.classList.toggle('active-accent', shortMode);
+      document.getElementById('shorter-toggle').classList.toggle('active', shortMode);
+      document.getElementById('shorter-toggle').classList.toggle('active-accent', shortMode);
     });
 
-    // ── Example chips ──────────────────────────────────────────────────
     document.querySelectorAll('.example-chip').forEach(chip => {
       chip.addEventListener('click', () => {
         document.getElementById('topic-input').value = chip.textContent;
@@ -705,6 +809,7 @@
 
     document.getElementById('new-debate-btn').addEventListener('click', () => {
       if (currentSource) { currentSource.close(); currentSource = null; }
+      flushTyping();
       document.getElementById('arena').style.display = 'none';
       document.getElementById('intro').style.display = 'flex';
       document.getElementById('new-debate-btn').style.display = 'none';
@@ -720,6 +825,8 @@
     function startDebate() {
       const topic = document.getElementById('topic-input').value.trim();
       if (!topic) { shake(document.getElementById('topic-input')); return; }
+
+      initAudio();
 
       document.getElementById('intro').style.display = 'none';
       document.getElementById('arena').style.display = 'block';
@@ -746,11 +853,12 @@
       };
     }
 
-    // ── Event handler ──────────────────────────────────────────────────
+    // ── SSE event handler ──────────────────────────────────────────────
     function handleEvent(e) {
       const ev = JSON.parse(e.data);
 
       switch (ev.type) {
+
         case 'debate_start':
           ev.personas.forEach(p => { PERSONAS[p.id] = p; });
           totalSteps = ev.num_rounds * ev.personas.length + 1;
@@ -762,7 +870,7 @@
 
         case 'round_start':
           document.getElementById('arena-badge').textContent = `round ${ev.round} of ${ev.total_rounds}`;
-          addRoundHeader(ev.round, ev.total_rounds);
+          addRoundHeader(ev.round);
           break;
 
         case 'agent_start': {
@@ -775,10 +883,12 @@
         }
 
         case 'agent_token':
-          appendToken(ev.token);
+          // push to typewriter queue — do NOT render directly
+          typeQueue += ev.token;
           break;
 
         case 'agent_end':
+          flushTyping();
           deactivateCurrentCard();
           completedSteps++;
           setProgress(completedSteps / totalSteps);
@@ -820,42 +930,42 @@
     }
 
     // ── OBJECTION banner ───────────────────────────────────────────────
-    const bannerConfig = {
-      objection: { text: 'OBJECTION!',   color: '#ff4040', shadow: '4px 4px 0 #880000, -1px -1px 0 rgba(255,255,255,0.15)' },
-      holdit:    { text: 'HOLD IT!',     color: '#ffe66d', shadow: '4px 4px 0 #665500, -1px -1px 0 rgba(255,255,255,0.1)' },
-      takethat:  { text: 'TAKE THAT!',   color: '#4ecdc4', shadow: '4px 4px 0 #1a6660, -1px -1px 0 rgba(255,255,255,0.1)' },
+    const BANNERS = {
+      objection: { text: 'OBJECTION!',  color: '#ff3030', shadow: '4px 4px 0 #880000' },
+      holdit:    { text: 'HOLD IT!',    color: '#ffe66d', shadow: '4px 4px 0 #665500' },
+      takethat:  { text: 'TAKE THAT!',  color: '#4ecdc4', shadow: '4px 4px 0 #1a6660' },
     };
 
     function pickBanner(personaId, round) {
-      if (speakersThisDebate === 0) return null; // very first speaker ever — no banner
-      if (personaId === 'devil') return 'objection';
-      if (round > 1) return personaId === 'visionary' ? 'takethat' : 'holdit';
-      return 'holdit'; // round 1, not first speaker
+      if (speakersThisDebate === 0) return null;
+      if (personaId === 'devil')     return 'objection';
+      if (round > 1)                 return personaId === 'visionary' ? 'takethat' : 'holdit';
+      return 'holdit';
     }
 
     let bannerTimer = null;
     function flashBanner(type) {
-      const cfg = bannerConfig[type];
+      const cfg = BANNERS[type];
       if (!cfg) return;
       const el = document.getElementById('objection-word');
-      el.textContent = cfg.text;
-      el.style.color = cfg.color;
+      el.textContent   = cfg.text;
+      el.style.color      = cfg.color;
       el.style.textShadow = cfg.shadow;
       el.classList.remove('bang');
-      el.offsetHeight; // reflow
+      el.offsetHeight;
       el.classList.add('bang');
       clearTimeout(bannerTimer);
       bannerTimer = setTimeout(() => el.classList.remove('bang'), 1100);
     }
 
     // ── DOM helpers ────────────────────────────────────────────────────
-    function addRoundHeader(round, total) {
+    function addRoundHeader(round) {
       const thread = document.getElementById('conversation-thread');
-      const header = document.createElement('div');
-      header.className = 'round-header';
-      header.style.marginTop = round === 1 ? '0' : '28px';
-      header.innerHTML = `<span class="round-label">Round ${round}</span><span class="round-line"></span>`;
-      thread.appendChild(header);
+      const h = document.createElement('div');
+      h.className = 'round-header';
+      h.style.marginTop = round === 1 ? '0' : '28px';
+      h.innerHTML = `<span class="round-label">Round ${round}</span><span class="round-line"></span>`;
+      thread.appendChild(h);
     }
 
     function createTurnCard(ev) {
@@ -863,7 +973,7 @@
       const p = PERSONAS[ev.persona_id];
       if (!p) return;
 
-      const uid = `t${Date.now().toString(36)}`;
+      const uid  = `t${Date.now().toString(36)}`;
       const card = document.createElement('div');
       card.className = 'turn-card speaking';
       card.style.setProperty('--card-color', p.color);
@@ -873,10 +983,7 @@
           <span class="portrait-emoji">${p.emoji}</span>
           <div class="portrait-name">${p.name}</div>
           <div class="portrait-role" style="color:${p.color}">${p.role}</div>
-          <div class="portrait-status">
-            <span class="status-dot"></span>
-            <span>speaking</span>
-          </div>
+          <div class="portrait-status"><span class="status-dot"></span><span>speaking</span></div>
         </div>
         <div class="card-compact">
           <span class="compact-emoji">${p.emoji}</span>
@@ -889,23 +996,15 @@
 
       thread.appendChild(card);
       thread.classList.add('has-active');
-      // slight delay so the OBJECTION banner is visible before card punches in
       setTimeout(() => card.scrollIntoView({ behavior: 'smooth', block: 'nearest' }), 120);
 
       currentActiveCard = {
         card,
-        bodyEl: document.getElementById(`ct-${uid}`),
+        bodyEl:   document.getElementById(`ct-${uid}`),
         cursorEl: document.getElementById(`cc-${uid}`),
-        text: '',
       };
-    }
 
-    function appendToken(token) {
-      if (!currentActiveCard) return;
-      currentActiveCard.text += token;
-      currentActiveCard.bodyEl.classList.add('has-text');
-      currentActiveCard.bodyEl.textContent = currentActiveCard.text;
-      currentActiveCard.bodyEl.appendChild(currentActiveCard.cursorEl);
+      startTyping(); // begin typewriter loop
     }
 
     function deactivateCurrentCard() {
@@ -922,13 +1021,13 @@
     let judgeBodyEl = null, judgeCursorEl = null, judgeText = '';
 
     function showJudgeSection() {
-      const section = document.getElementById('judge-section');
-      section.style.display = 'block';
-      section.style.animation = 'none';
-      section.offsetHeight;
-      section.style.opacity = '0';
-      section.style.animation = 'fadeUp 0.5s ease forwards';
-      section.innerHTML = `
+      const sec = document.getElementById('judge-section');
+      sec.style.display = 'block';
+      sec.style.animation = 'none';
+      sec.offsetHeight;
+      sec.style.opacity  = '0';
+      sec.style.animation = 'fadeUp 0.5s ease forwards';
+      sec.innerHTML = `
         <div class="judge-header">
           <span class="judge-title">⚖ Judge's Verdict</span>
           <span class="judge-line"></span>
@@ -937,7 +1036,7 @@
           <div class="judge-verdict" id="judge-body"><span class="cursor" id="judge-cursor"></span></div>
         </div>
       `;
-      judgeBodyEl = document.getElementById('judge-body');
+      judgeBodyEl   = document.getElementById('judge-body');
       judgeCursorEl = document.getElementById('judge-cursor');
       judgeText = '';
     }
