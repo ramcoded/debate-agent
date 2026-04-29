@@ -21,28 +21,30 @@ async def stream_argument(
 
     brevity = "Keep it brief — 2 to 3 sentences only. " if short else ""
 
+    no_formatting = "No bullet points, asterisks, bold text, quoted phrases, or symbols of any kind. Plain spoken sentences only. "
+
     if round_num == 1 and not history:
         prompt = (
-            f"The debate topic is: **{topic}**\n\n"
-            f"{brevity}You are opening the debate. State your position clearly and give a concrete reason for it. "
-            "Speak naturally, like you would in a real high-stakes discussion. Finish every sentence completely."
+            f"The debate topic is: {topic}\n\n"
+            f"{brevity}Open the debate. Say where you stand and give one solid reason why. "
+            f"{no_formatting}Finish every sentence completely."
         )
     elif round_num == 1:
         last = history[-1]
         prompt = (
-            f"The debate topic is: **{topic}**\n\n"
+            f"The debate topic is: {topic}\n\n"
             f"{brevity}Respond directly to what {last.persona_name} just said. "
-            "Challenge or build on their point, then clearly state your own position with a specific reason. "
-            "Speak naturally and finish every thought completely."
+            "Push back or build on their point, then state your own position with a specific reason. "
+            f"{no_formatting}Finish every thought completely."
             f"{context_block}"
         )
     else:
         last = history[-1]
         prompt = (
-            f"The debate topic is: **{topic}**\n\n"
-            f"Round {round_num} — {brevity}Push back on {last.persona_name}'s argument. "
-            "Name what they got wrong or what they're ignoring, then reinforce your own stance with a clear reason. "
-            "Speak naturally, as a real person would. Complete every sentence — do not trail off."
+            f"The debate topic is: {topic}\n\n"
+            f"Round {round_num} — {brevity}Push back on {last.persona_name}. "
+            "Say what they got wrong or what they're missing, then reinforce your own stance with a clear reason. "
+            f"{no_formatting}Complete every sentence — do not trail off."
             f"{context_block}"
         )
 

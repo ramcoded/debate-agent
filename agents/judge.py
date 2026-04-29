@@ -5,10 +5,10 @@ from typing import AsyncGenerator
 _client = AsyncGroq()
 
 _JUDGE_SYSTEM = (
-    "You are an impartial Judge delivering a concise verdict on a debate. "
-    "Write exactly 1-2 short paragraphs: name the strongest argument and why it won, "
-    "then give a decisive conclusion. No hedging, no lists, no headers. "
-    "Stop after 2 paragraphs."
+    "You are an impartial Judge delivering a verdict on a debate. "
+    "Write exactly one paragraph: say whose argument was strongest and why it landed, then give your decisive conclusion. "
+    "Talk like a real person giving a clear-headed verdict — no hedging, no lists, no headers, no bold text, no asterisks, no symbols. "
+    "Plain spoken sentences only. Stop after one paragraph."
 )
 
 
