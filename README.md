@@ -1,12 +1,12 @@
 # Debate Arena
 
-A multi-agent AI debate application where four expert personas argue any topic in real time, followed by a Judge that synthesizes a final verdict.
+A multi-agent AI debate application where expert personas argue any topic in real time, followed by a Judge that synthesizes a final verdict.
 
 ## What it does
 
-You enter any topic — a question, a statement, a controversy — and four AI agents immediately begin debating it live. Each agent has a distinct role, perspective, and argumentation style. After 1–3 configurable rounds of back-and-forth, an independent Judge delivers a structured verdict: who argued best, what points of consensus emerged, and what remains unresolved.
+You enter any topic — a question, a statement, a controversy — and AI agents immediately begin debating it live. Each agent has a distinct role, perspective, and argumentation style. After 1–3 configurable rounds of back-and-forth, an independent Judge delivers a structured verdict: who argued best, what points of consensus emerged, and what remains unresolved.
 
-### The four debaters
+### The debaters
 
 | Agent | Role | Approach |
 |---|---|---|
@@ -15,9 +15,23 @@ You enter any topic — a question, a statement, a controversy — and four AI a
 | **Marcus Webb** | The Devil's Advocate | Contrarian stress-testing, hidden costs, unintended consequences |
 | **Dr. Priya Nair** | The Ethicist | Human impact, equity, accountability, historical and philosophical framing |
 
+Run with 2 agents (Pragmatist vs. Devil's Advocate) or all 4.
+
 ### The Judge
 
-After all debate rounds complete, a separate Judge agent reads the full transcript and delivers a 4–5 paragraph verdict covering the strongest arguments, consensus points, unresolved tensions, and a clear actionable synthesis.
+After all debate rounds complete, a separate Judge agent reads the full transcript and delivers a verdict covering the strongest arguments, consensus points, unresolved tensions, and a clear actionable synthesis.
+
+## UI
+
+The frontend renders like a game dialogue system:
+
+- **Typewriter effect** — each token streams in character by character with subtle audio blips
+- **Game dialogue box** — active speaker shown in a styled nameplate box with animated dots; click anywhere on it (or spam-click) to skip to the end of their turn
+- **Portrait stage** — speaker portraits animate and highlight the active debater
+- **History bubbles** — completed turns are archived as chat bubbles above the stage
+- **OBJECTION / HOLD IT / TAKE THAT** banners flash between turns
+- **Concise mode** — toggle shorter responses for faster debates
+- **Reading pause** — a brief auto-advance pause after each turn, skippable by clicking
 
 ## Architecture
 
@@ -33,7 +47,7 @@ agents/personas.py     — Persona definitions and system prompts
 core/models.py         — Pydantic models and SSE event types
 ```
 
-The backend streams all output as Server-Sent Events (SSE). The frontend consumes the stream and renders each token as it arrives, giving a live "thinking" feel to each debater and the judge.
+The backend streams all output as Server-Sent Events (SSE). The frontend consumes the stream and renders each token as it arrives.
 
 ## Setup
 
@@ -66,6 +80,14 @@ python -m main
 ```
 
 Open `http://localhost:8000` in your browser.
+
+## Options
+
+| Option | Values | Default |
+|---|---|---|
+| Agents | 2 or 4 | 4 |
+| Rounds | 1, 2, or 3 | 2 |
+| Concise mode | on / off | off |
 
 ## Security
 
