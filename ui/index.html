@@ -532,6 +532,20 @@
       gap: 4px;
     }
 
+    .np-skip-hint {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 9px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--text-dim);
+      margin-left: 10px;
+      opacity: 0.7;
+      user-select: none;
+      border: 1px solid var(--border);
+      border-radius: 3px;
+      padding: 1px 6px;
+    }
+
     .ndot {
       width: 5px; height: 5px;
       border-radius: 50%;
@@ -1293,6 +1307,7 @@
               <span class="ndot" style="background:${p.color}"></span>
               <span class="ndot" style="background:${p.color}"></span>
             </span>
+            <span class="np-skip-hint">click to skip</span>
           </div>
           <div class="dialogue-body" id="db-${uid}"><span class="cursor" id="dc-${uid}"></span></div>
         </div>
