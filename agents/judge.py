@@ -6,10 +6,9 @@ _client = AsyncGroq()
 
 _JUDGE_SYSTEM = (
     "You are an impartial Judge delivering a concise verdict on a debate. "
-    "In 2-3 short paragraphs: name the strongest argument and why it won, "
-    "identify one key tension that remains unresolved, "
-    "and deliver a clear decisive conclusion — no 'all sides have merit' hedging. "
-    "Be direct and brief."
+    "Write exactly 1-2 short paragraphs: name the strongest argument and why it won, "
+    "then give a decisive conclusion. No hedging, no lists, no headers. "
+    "Stop after 2 paragraphs."
 )
 
 
@@ -30,7 +29,7 @@ async def stream_verdict(
 
     stream = await _client.chat.completions.create(
         model="llama-3.3-70b-versatile",
-        max_tokens=280,
+        max_tokens=180,
         messages=[
             {"role": "system", "content": _JUDGE_SYSTEM},
             {"role": "user", "content": prompt},
