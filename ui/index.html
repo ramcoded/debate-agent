@@ -560,6 +560,23 @@
     }
     .cursor.hidden { display: none; }
 
+    /* reading-pause indicator — blinking ▼ at end of text */
+    .read-indicator {
+      display: inline-block;
+      margin-left: 7px;
+      color: var(--text-dim);
+      font-size: 11px;
+      vertical-align: middle;
+      animation: blinkCursor 0.65s step-end infinite;
+      user-select: none;
+    }
+
+    /* dialogue box dims slightly while reader catches up */
+    .game-dialogue-box.reading .dialogue-body {
+      color: var(--text-muted);
+      transition: color 0.4s ease;
+    }
+
     /* ── Judge section ── */
     #judge-section {
       margin-top: 40px;
@@ -830,6 +847,10 @@
     let currentActiveCard = null;
     let speakersThisDebate = 0;
 
+    // ── Reading-pause queue ────────────────────────────────────────────
+    let pendingEvents    = [];
+    let processingPaused = false;
+
     // ── Typewriter state ───────────────────────────────────────────────
     let typeQueue     = '';
     let typeDisplayed = '';
@@ -1017,6 +1038,77 @@
     // ── SSE event handler ──────────────────────────────────────────────
     function handleEvent(e) {
       const ev = JSON.parse(e.data);
+      // Buffer turn-boundary events while a reading pause is active
+      if (processingPaused && (ev.type === 'agent_start' || ev.type === 'round_start' || ev.type === 'judge_start')) {
+        pendingEvents.push(ev);
+        return;
+      }
+      processEvent(ev);
+    }
+
+    function resumeEventProcessing() {
+      processingPaused = false;
+      while (pendingEvents.length > 0 && !processingPaused) {
+        processEvent(pendingEvents.shift());
+      }
+    }
+
+    // Slow-drain any remaining typeQueue chars, then hold for reading, then call onDone
+    function slowFlushThenPause(onDone) {
+      typingActive = false;
+      clearTimeout(typeTimeout);
+
+      const SLOW = 42; // ms per char during drain
+
+      function drain() {
+        if (!currentActiveCard) { onDone(); return; }
+        if (typeQueue.length === 0) {
+          // All text visible — show ▼ and wait for reader
+          showReadingIndicator(onDone);
+          return;
+        }
+        const ch = typeQueue[0];
+        typeQueue     = typeQueue.slice(1);
+        typeDisplayed += ch;
+
+        const { bodyEl, cursorEl } = currentActiveCard;
+        bodyEl.textContent = typeDisplayed;
+        bodyEl.appendChild(cursorEl);
+        playBlip('.?!…'.includes(ch));
+
+        let delay = SLOW;
+        if ('.?!…'.includes(ch)) delay = SLOW * 5;
+        else if (',;:'.includes(ch)) delay = SLOW * 2.5;
+        typeTimeout = setTimeout(drain, delay);
+      }
+
+      drain();
+    }
+
+    function showReadingIndicator(onDone) {
+      if (!currentActiveCard) { onDone(); return; }
+      const { boxEl, bodyEl, cursorEl } = currentActiveCard;
+
+      // Swap blinking cursor for a ▼ prompt
+      cursorEl.classList.add('hidden');
+      const ind = document.createElement('span');
+      ind.className = 'read-indicator';
+      ind.textContent = ' ▼';
+      bodyEl.appendChild(ind);
+
+      // Dim the nameplate dots to show "done speaking"
+      boxEl.classList.add('reading');
+      boxEl.querySelectorAll('.ndot').forEach(d => { d.style.animation = 'none'; d.style.opacity = '0.15'; });
+
+      setStatus('Reading…');
+
+      // Hold long enough relative to word count (min 2.2s, max 6s)
+      const words = typeDisplayed.trim().split(/\s+/).length;
+      const hold  = Math.max(2200, Math.min(words * 160, 6000));
+      setTimeout(onDone, hold);
+    }
+
+    function processEvent(ev) {
 
       switch (ev.type) {
 
@@ -1050,10 +1142,13 @@
           break;
 
         case 'agent_end':
-          flushTyping();
-          closeDialogueAndArchive();
-          completedSteps++;
-          setProgress(completedSteps / totalSteps);
+          processingPaused = true;
+          slowFlushThenPause(() => {
+            closeDialogueAndArchive();
+            completedSteps++;
+            setProgress(completedSteps / totalSteps);
+            resumeEventProcessing();
+          });
           break;
 
         case 'round_end':
