@@ -36,7 +36,7 @@
       line-height: 1.7;
     }
 
-    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar { width: 5px; }
     ::-webkit-scrollbar-track { background: var(--bg); }
     ::-webkit-scrollbar-thumb { background: var(--border-bright); border-radius: 3px; }
 
@@ -51,12 +51,12 @@
     header {
       width: 100%;
       max-width: 860px;
-      padding: 48px 0 32px;
+      padding: 36px 0 24px;
       display: flex;
       align-items: baseline;
       gap: 16px;
       border-bottom: 1px solid var(--border);
-      margin-bottom: 56px;
+      margin-bottom: 48px;
     }
 
     .logo {
@@ -222,20 +222,20 @@
     .example-chip:hover { border-color: var(--border-bright); color: var(--text); }
 
     /* ── Arena ── */
-    #arena { display: none; }
+    #arena { display: none; flex-direction: column; gap: 0; }
 
     .arena-header {
       display: flex;
       align-items: center;
       gap: 16px;
-      margin-bottom: 36px;
-      padding-bottom: 20px;
+      margin-bottom: 24px;
+      padding-bottom: 18px;
       border-bottom: 1px solid var(--border);
     }
 
     .arena-topic {
       font-family: 'Playfair Display', serif;
-      font-size: 22px;
+      font-size: 20px;
       font-weight: 700;
       font-style: italic;
       color: var(--text);
@@ -254,170 +254,300 @@
       white-space: nowrap;
     }
 
-    /* ── Round divider ── */
-    .round-header {
-      display: flex;
-      align-items: center;
-      gap: 16px;
-      margin-bottom: 12px;
-      opacity: 0;
-      animation: fadeUp 0.35s ease forwards;
-    }
-
-    .round-label {
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 11px;
-      letter-spacing: 0.2em;
-      text-transform: uppercase;
-      color: var(--text-muted);
-      white-space: nowrap;
-    }
-
-    .round-line { flex: 1; height: 1px; background: var(--border); }
-
-    /* ── Conversation thread ── */
-    .conversation-thread {
+    /* ── History ── */
+    .dialogue-history {
       display: flex;
       flex-direction: column;
       gap: 10px;
+      min-height: 40px;
+      max-height: 300px;
+      overflow-y: auto;
+      padding: 0 2px 18px;
+      scroll-behavior: smooth;
     }
 
-    .conversation-thread.has-active .turn-card.done {
-      opacity: 0.38;
-      transition: opacity 0.3s ease;
+    .history-divider {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      opacity: 0.45;
+      flex-shrink: 0;
     }
 
-    /* ── Turn card ── */
-    .turn-card {
+    .history-divider-label {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--text-dim);
+      white-space: nowrap;
+    }
+
+    .history-divider-line { flex: 1; height: 1px; background: var(--border); }
+
+    .history-bubble {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      max-width: 72%;
+      opacity: 0;
+      animation: bubbleAppear 0.32s ease forwards;
+      flex-shrink: 0;
+    }
+
+    .history-bubble.side-left  { align-self: flex-start; }
+    .history-bubble.side-right { align-self: flex-end; text-align: right; }
+
+    .bubble-header {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--bubble-color, var(--text-dim));
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .history-bubble.side-right .bubble-header { flex-direction: row-reverse; }
+
+    .bubble-body {
       background: var(--surface);
       border: 1px solid var(--border);
-      border-left: 3px solid var(--card-color, transparent);
       border-radius: 8px;
-      padding: 18px 22px 20px;
-      opacity: 0;
-      animation: cardPunchIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-      transition: background 0.3s, box-shadow 0.3s, opacity 0.3s;
+      padding: 9px 14px;
+      font-size: 13px;
+      line-height: 1.65;
+      color: var(--text-muted);
     }
 
-    .turn-card.speaking {
-      background: var(--surface-2);
-      box-shadow: 0 0 0 1px var(--card-color, transparent) inset,
-                  0 12px 40px rgba(0,0,0,0.35);
+    .history-bubble.side-left  .bubble-body { border-left:  2px solid var(--bubble-color, var(--border)); border-radius: 2px 8px 8px 8px; }
+    .history-bubble.side-right .bubble-body { border-right: 2px solid var(--bubble-color, var(--border)); border-radius: 8px 2px 8px 8px; }
+
+    /* ── Portrait stage ── */
+    .portrait-stage {
+      display: flex;
+      align-items: flex-end;
+      border-top: 1px solid var(--border);
+      padding-top: 20px;
+      margin-top: 4px;
+      min-height: 148px;
+      position: relative;
     }
 
-    .turn-card.done { opacity: 0.85; }
-
-    /* ── Portrait (visible while speaking, collapses when done) ── */
-    .card-portrait {
-      text-align: center;
-      padding: 24px 0 18px;
-      max-height: 260px;
-      opacity: 1;
-      overflow: hidden;
-      transition: max-height 0.4s ease, opacity 0.3s ease, padding 0.4s ease;
-    }
-
-    .turn-card.done .card-portrait {
-      max-height: 0;
-      opacity: 0;
-      padding: 0;
+    /* subtle scanline texture for game feel */
+    .portrait-stage::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: repeating-linear-gradient(
+        to bottom,
+        transparent,
+        transparent 3px,
+        rgba(255,255,255,0.008) 3px,
+        rgba(255,255,255,0.008) 4px
+      );
       pointer-events: none;
     }
 
-    .portrait-emoji {
-      font-size: 80px;
-      line-height: 1;
-      display: block;
-      margin-bottom: 14px;
-      animation: portraitBob 0.55s ease-in-out infinite alternate;
-      filter: drop-shadow(0 4px 12px rgba(0,0,0,0.4));
+    .portrait-side {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
     }
 
-    .portrait-name {
-      font-family: 'Playfair Display', serif;
-      font-size: 20px;
-      font-weight: 700;
-      color: var(--text);
-      margin-bottom: 4px;
-    }
+    .portrait-side-left  { align-items: flex-start; padding-left: 8px; }
+    .portrait-side-right { align-items: flex-end;   padding-right: 8px; }
 
-    .portrait-role {
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 10px;
-      letter-spacing: 0.18em;
-      text-transform: uppercase;
-      margin-bottom: 14px;
-    }
-
-    .portrait-status {
-      display: inline-flex;
+    .stage-center {
+      display: flex;
+      flex-direction: column;
       align-items: center;
+      justify-content: flex-end;
+      padding: 0 14px 14px;
       gap: 6px;
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 10px;
+      flex-shrink: 0;
+    }
+
+    .vs-text {
+      font-family: 'Playfair Display', serif;
+      font-size: 13px;
+      font-weight: 900;
+      font-style: italic;
       color: var(--text-dim);
-      letter-spacing: 0.08em;
+      letter-spacing: 0.12em;
     }
 
-    .status-dot {
-      width: 6px; height: 6px;
-      border-radius: 50%;
-      background: var(--card-color, var(--text-dim));
-      animation: blinkDot 0.8s ease infinite;
+    .round-pip {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 9px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--text-dim);
+      opacity: 0.6;
     }
 
-    /* ── Compact header (hidden while speaking, shown when done) ── */
-    .card-compact {
+    /* ── Portrait card ── */
+    .portrait-card {
       display: flex;
       align-items: center;
-      gap: 8px;
-      height: 0;
-      overflow: hidden;
-      opacity: 0;
-      transition: height 0.35s ease 0.12s, opacity 0.3s ease 0.18s, margin-bottom 0.35s ease 0.12s;
-      margin-bottom: 0;
+      gap: 10px;
+      padding: 10px 14px 10px 12px;
+      border-radius: 7px;
+      border: 1px solid transparent;
+      transition: opacity 0.35s ease, transform 0.35s cubic-bezier(0.16, 1, 0.3, 1),
+                  border-color 0.3s ease, background 0.3s ease, box-shadow 0.35s ease;
     }
 
-    .turn-card.done .card-compact {
-      height: 28px;
+    .portrait-side-right .portrait-card { flex-direction: row-reverse; padding: 10px 12px 10px 14px; }
+
+    .portrait-card.inactive {
+      opacity: 0.22;
+      transform: scale(0.93) translateY(4px);
+    }
+
+    .portrait-card.active {
       opacity: 1;
-      margin-bottom: 8px;
+      transform: scale(1) translateY(0);
+      border-color: var(--pcolor, var(--border-bright));
+      background: rgba(255,255,255,0.025);
+      box-shadow: 0 0 0 1px rgba(255,255,255,0.03) inset,
+                  0 8px 32px rgba(0,0,0,0.4);
     }
 
-    .compact-emoji { font-size: 17px; line-height: 1; }
+    .p-emoji-wrap {
+      font-size: 44px;
+      line-height: 1;
+      flex-shrink: 0;
+      transition: transform 0.35s ease;
+    }
 
-    .compact-name {
+    .portrait-card.active .p-emoji-wrap {
+      animation: portraitBob 0.65s ease-in-out infinite alternate;
+    }
+
+    .p-info {
+      display: flex;
+      flex-direction: column;
+      gap: 1px;
+    }
+
+    .portrait-side-right .p-info { align-items: flex-end; }
+
+    .p-name {
       font-family: 'Playfair Display', serif;
       font-size: 13px;
       font-weight: 700;
       color: var(--text);
+      line-height: 1.25;
     }
 
-    .compact-sep { color: var(--text-dim); font-size: 11px; margin: 0 1px; }
-
-    .compact-role {
+    .p-role {
       font-family: 'JetBrains Mono', monospace;
-      font-size: 10px;
-      letter-spacing: 0.08em;
+      font-size: 9px;
+      letter-spacing: 0.1em;
       text-transform: uppercase;
     }
 
-    /* ── Dialogue text ── */
-    .card-text {
-      font-size: 14px;
-      line-height: 1.78;
+    .p-speaking {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      margin-top: 4px;
+      opacity: 0;
+      transition: opacity 0.25s ease;
+    }
+
+    .portrait-card.active .p-speaking { opacity: 1; }
+    .portrait-side-right .p-speaking   { flex-direction: row-reverse; }
+
+    .p-speak-dot {
+      width: 5px; height: 5px;
+      border-radius: 50%;
+      background: var(--pcolor);
+      animation: blinkDot 0.72s ease infinite;
+    }
+
+    .p-speak-label {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 9px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--text-dim);
+    }
+
+    /* ── Game dialogue box ── */
+    .game-dialogue-wrap {
+      border-bottom: 1px solid var(--border);
+    }
+
+    .game-dialogue-box {
+      background: var(--surface-2);
+      border-left:  1px solid var(--border-bright);
+      border-right: 1px solid var(--border-bright);
+      border-bottom: 1px solid var(--border-bright);
+      border-top: 3px solid var(--dcolor, var(--border-bright));
+      border-radius: 0 0 6px 6px;
+      overflow: hidden;
+      animation: dialogueSlideUp 0.26s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+
+    .game-dialogue-box.closing {
+      animation: dialogueFadeOut 0.22s ease forwards;
+    }
+
+    .dialogue-nameplate {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      padding: 9px 18px 8px;
+      border-bottom: 1px solid var(--border);
+      background: rgba(0,0,0,0.28);
+    }
+
+    .np-emoji { font-size: 17px; line-height: 1; }
+
+    .np-name {
+      font-family: 'Playfair Display', serif;
+      font-size: 15px;
+      font-weight: 700;
+    }
+
+    .np-sep { color: var(--text-dim); font-size: 12px; margin: 0 1px; }
+
+    .np-role {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px;
+      letter-spacing: 0.09em;
+      text-transform: uppercase;
       color: var(--text-muted);
-      border-top: 1px solid var(--border);
-      padding-top: 14px;
     }
 
-    .turn-card.speaking .card-text {
-      font-size: 16px;
+    .np-dots {
+      margin-left: auto;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .ndot {
+      width: 5px; height: 5px;
+      border-radius: 50%;
+      animation: blinkDot 0.8s ease infinite;
+    }
+
+    .ndot:nth-child(2) { animation-delay: 0.18s; }
+    .ndot:nth-child(3) { animation-delay: 0.36s; }
+
+    .dialogue-body {
+      padding: 15px 20px 18px;
+      font-family: 'Lora', serif;
+      font-size: 15.5px;
+      line-height: 1.8;
       color: var(--text);
-      border-top-color: var(--border-bright);
+      min-height: 88px;
     }
-
-    .card-text.has-text { color: var(--text); }
 
     /* Blinking cursor */
     .cursor {
@@ -428,12 +558,11 @@
       vertical-align: middle;
       animation: blinkCursor 0.55s step-end infinite;
     }
-
     .cursor.hidden { display: none; }
 
     /* ── Judge section ── */
     #judge-section {
-      margin-top: 48px;
+      margin-top: 40px;
       opacity: 0;
       animation: fadeUp 0.5s ease forwards;
     }
@@ -442,7 +571,7 @@
       display: flex;
       align-items: center;
       gap: 16px;
-      margin-bottom: 20px;
+      margin-bottom: 18px;
     }
 
     .judge-title {
@@ -461,10 +590,10 @@
       border: 1px solid rgba(245,158,11,0.2);
       border-radius: 8px;
       border-left: 3px solid var(--gold);
-      padding: 28px 32px;
+      padding: 26px 30px;
     }
 
-    .judge-verdict { font-size: 15px; line-height: 1.8; color: var(--text); }
+    .judge-verdict { font-size: 15px; line-height: 1.82; color: var(--text); }
     .judge-verdict strong { color: var(--gold); font-weight: 500; }
 
     /* ── Status bar ── */
@@ -489,7 +618,7 @@
     }
 
     .progress-track { width: 120px; height: 2px; background: var(--border); border-radius: 1px; overflow: hidden; }
-    .progress-fill { height: 100%; background: var(--text-muted); width: 0%; transition: width 0.4s ease; border-radius: 1px; }
+    .progress-fill  { height: 100%; background: var(--text-muted); width: 0%; transition: width 0.4s ease; border-radius: 1px; }
 
     #sound-btn {
       background: none;
@@ -508,7 +637,7 @@
     /* ── New debate button ── */
     #new-debate-btn {
       display: none;
-      margin: 40px auto 0;
+      margin: 36px auto 0;
       padding: 12px 28px;
       background: transparent;
       border: 1px solid var(--border-bright);
@@ -555,15 +684,25 @@
       to   { opacity: 1; transform: translateY(0); }
     }
 
-    @keyframes cardPunchIn {
-      0%   { opacity: 0; transform: translateY(18px) scale(0.97); }
-      55%  { transform: translateY(-3px) scale(1.005); }
-      100% { opacity: 1; transform: translateY(0) scale(1); }
+    @keyframes bubbleAppear {
+      from { opacity: 0; transform: translateY(8px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes dialogueSlideUp {
+      0%   { opacity: 0; transform: translateY(18px) scaleY(0.94); transform-origin: bottom; }
+      60%  { transform: translateY(-2px) scaleY(1.01); }
+      100% { opacity: 1; transform: translateY(0) scaleY(1); }
+    }
+
+    @keyframes dialogueFadeOut {
+      from { opacity: 1; transform: translateY(0); }
+      to   { opacity: 0; transform: translateY(10px); }
     }
 
     @keyframes portraitBob {
       from { transform: translateY(0px); }
-      to   { transform: translateY(-10px); }
+      to   { transform: translateY(-8px); }
     }
 
     @keyframes blinkCursor {
@@ -573,7 +712,7 @@
 
     @keyframes blinkDot {
       0%, 100% { opacity: 1; }
-      50%       { opacity: 0.2; }
+      50%       { opacity: 0.18; }
     }
 
     @keyframes pwBang {
@@ -598,6 +737,7 @@
     </header>
 
     <div id="stage">
+      <!-- ── Intro ── -->
       <div id="intro">
         <div class="intro-eyebrow">Multi-Agent Intelligence</div>
         <h1 class="intro-title"><span id="agent-count-label">Four</span> Minds.<br><em>One Verdict.</em></h1>
@@ -637,13 +777,32 @@
         </div>
       </div>
 
+      <!-- ── Arena ── -->
       <div id="arena">
         <div class="arena-header">
           <div class="arena-topic" id="arena-topic"></div>
           <div class="arena-badge" id="arena-badge">preparing</div>
         </div>
-        <div id="conversation-thread" class="conversation-thread"></div>
+
+        <!-- History of completed turns -->
+        <div id="dialogue-history" class="dialogue-history"></div>
+
+        <!-- Character portrait stage -->
+        <div class="portrait-stage" id="portrait-stage">
+          <div class="portrait-side portrait-side-left"  id="portraits-left"></div>
+          <div class="stage-center">
+            <span class="vs-text">VS</span>
+            <span class="round-pip" id="round-pip">—</span>
+          </div>
+          <div class="portrait-side portrait-side-right" id="portraits-right"></div>
+        </div>
+
+        <!-- Active game dialogue box -->
+        <div class="game-dialogue-wrap" id="game-dialogue-wrap" style="display:none"></div>
+
+        <!-- Judge section -->
         <div id="judge-section" style="display:none"></div>
+
         <button id="new-debate-btn">← New debate</button>
       </div>
     </div>
@@ -660,6 +819,7 @@
   <script>
     // ── App state ──────────────────────────────────────────────────────
     const PERSONAS = {};
+    const personaSide = {};   // persona_id → 'left' | 'right'
     let selectedRounds = 2;
     let selectedAgents = 4;
     let shortMode = false;
@@ -671,45 +831,37 @@
     let speakersThisDebate = 0;
 
     // ── Typewriter state ───────────────────────────────────────────────
-    let typeQueue = '';
+    let typeQueue     = '';
     let typeDisplayed = '';
-    let typeTimeout = null;
-    let typingActive = false;
+    let typeTimeout   = null;
+    let typingActive  = false;
 
-    // delay per character type (ms)
-    const T_CHAR  = 28;
-    const T_SPACE = 8;
-    const T_COMMA = 110;  // , ; :
-    const T_STOP  = 360;  // . ? ! …
+    const T_CHAR  = 26;
+    const T_SPACE = 7;
+    const T_COMMA = 105;
+    const T_STOP  = 340;
 
     function startTyping() {
-      typeQueue = '';
+      typeQueue     = '';
       typeDisplayed = '';
-      typingActive = true;
+      typingActive  = true;
       clearTimeout(typeTimeout);
       typeStep();
     }
 
     function typeStep() {
       if (!typingActive || !currentActiveCard) return;
-
-      if (typeQueue.length === 0) {
-        // wait for more tokens
-        typeTimeout = setTimeout(typeStep, 12);
-        return;
-      }
+      if (typeQueue.length === 0) { typeTimeout = setTimeout(typeStep, 12); return; }
 
       const ch = typeQueue[0];
-      typeQueue = typeQueue.slice(1);
+      typeQueue     = typeQueue.slice(1);
       typeDisplayed += ch;
 
       const body = currentActiveCard.bodyEl;
       const cur  = currentActiveCard.cursorEl;
-      body.classList.add('has-text');
       body.textContent = typeDisplayed;
       body.appendChild(cur);
 
-      // cursor flash on each character
       if (ch !== ' ' && ch !== '\n') {
         cur.style.opacity = '0';
         requestAnimationFrame(() => { if (cur) cur.style.opacity = '1'; });
@@ -717,9 +869,9 @@
       }
 
       let delay = T_CHAR;
-      if (ch === ' ' || ch === '\n')    delay = T_SPACE;
-      else if ('.?!…'.includes(ch))     delay = T_STOP;
-      else if (',;:'.includes(ch))      delay = T_COMMA;
+      if (ch === ' ' || ch === '\n') delay = T_SPACE;
+      else if ('.?!…'.includes(ch))  delay = T_STOP;
+      else if (',;:'.includes(ch))   delay = T_COMMA;
 
       typeTimeout = setTimeout(typeStep, delay);
     }
@@ -732,7 +884,6 @@
         typeQueue = '';
         const body = currentActiveCard.bodyEl;
         const cur  = currentActiveCard.cursorEl;
-        body.classList.add('has-text');
         body.textContent = typeDisplayed;
         body.appendChild(cur);
       }
@@ -813,9 +964,14 @@
       document.getElementById('arena').style.display = 'none';
       document.getElementById('intro').style.display = 'flex';
       document.getElementById('new-debate-btn').style.display = 'none';
-      document.getElementById('conversation-thread').innerHTML = '';
+      document.getElementById('dialogue-history').innerHTML = '';
+      document.getElementById('portraits-left').innerHTML = '';
+      document.getElementById('portraits-right').innerHTML = '';
+      document.getElementById('game-dialogue-wrap').style.display = 'none';
+      document.getElementById('game-dialogue-wrap').innerHTML = '';
       document.getElementById('judge-section').style.display = 'none';
       document.getElementById('judge-section').innerHTML = '';
+      document.getElementById('round-pip').textContent = '—';
       currentActiveCard = null;
       speakersThisDebate = 0;
       setStatus('Ready.');
@@ -829,12 +985,17 @@
       initAudio();
 
       document.getElementById('intro').style.display = 'none';
-      document.getElementById('arena').style.display = 'block';
+      document.getElementById('arena').style.display = 'flex';
       document.getElementById('arena-topic').textContent = `"${topic}"`;
       document.getElementById('arena-badge').textContent = 'connecting…';
-      document.getElementById('conversation-thread').innerHTML = '';
+      document.getElementById('dialogue-history').innerHTML = '';
+      document.getElementById('portraits-left').innerHTML = '';
+      document.getElementById('portraits-right').innerHTML = '';
+      document.getElementById('game-dialogue-wrap').style.display = 'none';
+      document.getElementById('game-dialogue-wrap').innerHTML = '';
       document.getElementById('judge-section').style.display = 'none';
       document.getElementById('new-debate-btn').style.display = 'none';
+      document.getElementById('round-pip').textContent = '—';
       currentActiveCard = null;
       speakersThisDebate = 0;
       debateCompleted = false;
@@ -861,35 +1022,36 @@
 
         case 'debate_start':
           ev.personas.forEach(p => { PERSONAS[p.id] = p; });
-          totalSteps = ev.num_rounds * ev.personas.length + 1;
+          totalSteps   = ev.num_rounds * ev.personas.length + 1;
           completedSteps = 0;
           document.getElementById('arena-badge').textContent = 'round 1 of ' + ev.num_rounds;
           setStatus('Debate starting…');
           setProgress(0);
+          setupPortraitStage(ev.personas);
           break;
 
         case 'round_start':
           document.getElementById('arena-badge').textContent = `round ${ev.round} of ${ev.total_rounds}`;
-          addRoundHeader(ev.round);
+          document.getElementById('round-pip').textContent   = `round ${ev.round}`;
+          addHistoryDivider(`Round ${ev.round}`);
           break;
 
         case 'agent_start': {
           const banner = pickBanner(ev.persona_id, ev.round);
           if (banner) flashBanner(banner);
-          createTurnCard(ev);
+          showGameDialogue(ev);
           speakersThisDebate++;
           setStatus(`${ev.persona_name} — ${ev.persona_role} is arguing…`);
           break;
         }
 
         case 'agent_token':
-          // push to typewriter queue — do NOT render directly
           typeQueue += ev.token;
           break;
 
         case 'agent_end':
           flushTyping();
-          deactivateCurrentCard();
+          closeDialogueAndArchive();
           completedSteps++;
           setProgress(completedSteps / totalSteps);
           break;
@@ -900,6 +1062,8 @@
         case 'judge_start':
           setStatus('Judge is synthesizing the verdict…');
           document.getElementById('arena-badge').textContent = 'verdict';
+          document.getElementById('portrait-stage').style.display = 'none';
+          document.getElementById('game-dialogue-wrap').style.display = 'none';
           showJudgeSection();
           break;
 
@@ -929,6 +1093,160 @@
       }
     }
 
+    // ── Portrait stage setup ───────────────────────────────────────────
+    function setupPortraitStage(personas) {
+      const leftEl  = document.getElementById('portraits-left');
+      const rightEl = document.getElementById('portraits-right');
+      leftEl.innerHTML  = '';
+      rightEl.innerHTML = '';
+
+      personas.forEach((p, i) => {
+        const side = i % 2 === 0 ? 'left' : 'right';
+        personaSide[p.id] = side;
+        const container = side === 'left' ? leftEl : rightEl;
+
+        const card = document.createElement('div');
+        card.className = 'portrait-card inactive';
+        card.id = `portrait-${p.id}`;
+        card.style.setProperty('--pcolor', p.color);
+        card.innerHTML = `
+          <div class="p-emoji-wrap">${p.emoji}</div>
+          <div class="p-info">
+            <div class="p-name">${p.name}</div>
+            <div class="p-role" style="color:${p.color}">${p.role}</div>
+            <div class="p-speaking">
+              <span class="p-speak-dot" style="background:${p.color}"></span>
+              <span class="p-speak-label">speaking</span>
+            </div>
+          </div>
+        `;
+        container.appendChild(card);
+      });
+    }
+
+    function activatePortrait(personaId) {
+      document.querySelectorAll('.portrait-card').forEach(el => {
+        el.classList.remove('active');
+        el.classList.add('inactive');
+      });
+      const el = document.getElementById(`portrait-${personaId}`);
+      if (el) { el.classList.remove('inactive'); el.classList.add('active'); }
+    }
+
+    function dimAllPortraits() {
+      document.querySelectorAll('.portrait-card').forEach(el => {
+        el.classList.remove('active');
+        el.classList.add('inactive');
+      });
+    }
+
+    // ── Game dialogue box ──────────────────────────────────────────────
+    function showGameDialogue(ev) {
+      const p = PERSONAS[ev.persona_id];
+      if (!p) return;
+
+      activatePortrait(ev.persona_id);
+
+      const wrap = document.getElementById('game-dialogue-wrap');
+      wrap.style.display = 'block';
+
+      const uid = `d${Date.now().toString(36)}`;
+      wrap.innerHTML = `
+        <div class="game-dialogue-box" id="gdb-${uid}" style="--dcolor:${p.color}">
+          <div class="dialogue-nameplate">
+            <span class="np-emoji">${p.emoji}</span>
+            <span class="np-name" style="color:${p.color}">${p.name}</span>
+            <span class="np-sep">·</span>
+            <span class="np-role">${p.role}</span>
+            <span class="np-dots">
+              <span class="ndot" style="background:${p.color}"></span>
+              <span class="ndot" style="background:${p.color}"></span>
+              <span class="ndot" style="background:${p.color}"></span>
+            </span>
+          </div>
+          <div class="dialogue-body" id="db-${uid}"><span class="cursor" id="dc-${uid}"></span></div>
+        </div>
+      `;
+
+      currentActiveCard = {
+        boxEl:    document.getElementById(`gdb-${uid}`),
+        bodyEl:   document.getElementById(`db-${uid}`),
+        cursorEl: document.getElementById(`dc-${uid}`),
+        personaId:    ev.persona_id,
+        personaColor: p.color,
+        personaName:  p.name,
+        personaEmoji: p.emoji,
+        personaRole:  p.role,
+      };
+
+      startTyping();
+      setTimeout(() => wrap.scrollIntoView({ behavior: 'smooth', block: 'nearest' }), 80);
+    }
+
+    function closeDialogueAndArchive() {
+      if (!currentActiveCard) return;
+
+      const { boxEl, cursorEl, personaId, personaColor, personaName, personaEmoji } = currentActiveCard;
+      const text = typeDisplayed;
+      const side = personaSide[personaId] || 'left';
+
+      cursorEl.classList.add('hidden');
+
+      // Slide out the dialogue box
+      boxEl.classList.add('closing');
+
+      // Add to history
+      addHistoryBubble({ text, side, personaColor, personaName, personaEmoji });
+
+      setTimeout(() => {
+        const wrap = document.getElementById('game-dialogue-wrap');
+        wrap.style.display = 'none';
+        wrap.innerHTML = '';
+      }, 240);
+
+      dimAllPortraits();
+      currentActiveCard = null;
+    }
+
+    // ── History bubbles ────────────────────────────────────────────────
+    function addHistoryDivider(label) {
+      const history = document.getElementById('dialogue-history');
+      const div = document.createElement('div');
+      div.className = 'history-divider';
+      div.innerHTML = `
+        <span class="history-divider-label">${label}</span>
+        <span class="history-divider-line"></span>
+      `;
+      history.appendChild(div);
+      history.scrollTop = history.scrollHeight;
+    }
+
+    function addHistoryBubble({ text, side, personaColor, personaName, personaEmoji }) {
+      const history = document.getElementById('dialogue-history');
+      const bubble  = document.createElement('div');
+      bubble.className = `history-bubble side-${side}`;
+      bubble.style.setProperty('--bubble-color', personaColor);
+
+      bubble.innerHTML = `
+        <div class="bubble-header">
+          <span>${personaEmoji}</span>
+          <span>${personaName}</span>
+        </div>
+        <div class="bubble-body">${escapeHtml(text)}</div>
+      `;
+
+      history.appendChild(bubble);
+      setTimeout(() => { history.scrollTop = history.scrollHeight; }, 50);
+    }
+
+    function escapeHtml(str) {
+      return str
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/\n/g, '<br>');
+    }
+
     // ── OBJECTION banner ───────────────────────────────────────────────
     const BANNERS = {
       objection: { text: 'OBJECTION!',  color: '#ff3030', shadow: '4px 4px 0 #880000' },
@@ -938,8 +1256,8 @@
 
     function pickBanner(personaId, round) {
       if (speakersThisDebate === 0) return null;
-      if (personaId === 'devil')     return 'objection';
-      if (round > 1)                 return personaId === 'visionary' ? 'takethat' : 'holdit';
+      if (personaId === 'devil')    return 'objection';
+      if (round > 1)                return personaId === 'visionary' ? 'takethat' : 'holdit';
       return 'holdit';
     }
 
@@ -948,7 +1266,7 @@
       const cfg = BANNERS[type];
       if (!cfg) return;
       const el = document.getElementById('objection-word');
-      el.textContent   = cfg.text;
+      el.textContent      = cfg.text;
       el.style.color      = cfg.color;
       el.style.textShadow = cfg.shadow;
       el.classList.remove('bang');
@@ -958,74 +1276,15 @@
       bannerTimer = setTimeout(() => el.classList.remove('bang'), 1100);
     }
 
-    // ── DOM helpers ────────────────────────────────────────────────────
-    function addRoundHeader(round) {
-      const thread = document.getElementById('conversation-thread');
-      const h = document.createElement('div');
-      h.className = 'round-header';
-      h.style.marginTop = round === 1 ? '0' : '28px';
-      h.innerHTML = `<span class="round-label">Round ${round}</span><span class="round-line"></span>`;
-      thread.appendChild(h);
-    }
-
-    function createTurnCard(ev) {
-      const thread = document.getElementById('conversation-thread');
-      const p = PERSONAS[ev.persona_id];
-      if (!p) return;
-
-      const uid  = `t${Date.now().toString(36)}`;
-      const card = document.createElement('div');
-      card.className = 'turn-card speaking';
-      card.style.setProperty('--card-color', p.color);
-
-      card.innerHTML = `
-        <div class="card-portrait">
-          <span class="portrait-emoji">${p.emoji}</span>
-          <div class="portrait-name">${p.name}</div>
-          <div class="portrait-role" style="color:${p.color}">${p.role}</div>
-          <div class="portrait-status"><span class="status-dot"></span><span>speaking</span></div>
-        </div>
-        <div class="card-compact">
-          <span class="compact-emoji">${p.emoji}</span>
-          <span class="compact-name">${p.name}</span>
-          <span class="compact-sep">·</span>
-          <span class="compact-role" style="color:${p.color}">${p.role}</span>
-        </div>
-        <div class="card-text" id="ct-${uid}"><span class="cursor" id="cc-${uid}"></span></div>
-      `;
-
-      thread.appendChild(card);
-      thread.classList.add('has-active');
-      setTimeout(() => card.scrollIntoView({ behavior: 'smooth', block: 'nearest' }), 120);
-
-      currentActiveCard = {
-        card,
-        bodyEl:   document.getElementById(`ct-${uid}`),
-        cursorEl: document.getElementById(`cc-${uid}`),
-      };
-
-      startTyping(); // begin typewriter loop
-    }
-
-    function deactivateCurrentCard() {
-      if (!currentActiveCard) return;
-      const { card, cursorEl } = currentActiveCard;
-      card.classList.remove('speaking');
-      card.classList.add('done');
-      cursorEl.classList.add('hidden');
-      document.getElementById('conversation-thread').classList.remove('has-active');
-      currentActiveCard = null;
-    }
-
     // ── Judge ──────────────────────────────────────────────────────────
     let judgeBodyEl = null, judgeCursorEl = null, judgeText = '';
 
     function showJudgeSection() {
       const sec = document.getElementById('judge-section');
-      sec.style.display = 'block';
+      sec.style.display   = 'block';
       sec.style.animation = 'none';
       sec.offsetHeight;
-      sec.style.opacity  = '0';
+      sec.style.opacity   = '0';
       sec.style.animation = 'fadeUp 0.5s ease forwards';
       sec.innerHTML = `
         <div class="judge-header">
