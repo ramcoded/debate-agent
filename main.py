@@ -9,7 +9,7 @@ if not os.getenv("GROQ_API_KEY"):
 
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import HTMLResponse
+from fastapi.responses import HTMLResponse, Response
 from starlette.middleware.base import BaseHTTPMiddleware
 from slowapi.errors import RateLimitExceeded
 from slowapi import _rate_limit_exceeded_handler
@@ -46,6 +46,12 @@ app.add_middleware(
 )
 
 app.include_router(router, prefix="/api")
+
+
+@app.get("/favicon.svg", include_in_schema=False)
+async def favicon():
+    svg = Path("ui/favicon.svg").read_bytes()
+    return Response(content=svg, media_type="image/svg+xml", headers={"Cache-Control": "public, max-age=86400"})
 
 
 @app.get("/", response_class=HTMLResponse)
