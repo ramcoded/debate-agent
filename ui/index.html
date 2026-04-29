@@ -850,6 +850,8 @@
     // ── Reading-pause queue ────────────────────────────────────────────
     let pendingEvents    = [];
     let processingPaused = false;
+    let skipFn           = null;   // called on click-to-skip
+    let dialogueClearTimer = null; // tracks the post-close wrap-clear timeout
 
     // ── Typewriter state ───────────────────────────────────────────────
     let typeQueue     = '';
@@ -935,6 +937,10 @@
       } catch(e) {}
     }
 
+    document.getElementById('game-dialogue-wrap').addEventListener('click', () => {
+      if (skipFn) { const fn = skipFn; skipFn = null; fn(); }
+    });
+
     document.getElementById('sound-btn').addEventListener('click', () => {
       soundOn = !soundOn;
       const btn = document.getElementById('sound-btn');
@@ -995,6 +1001,9 @@
       document.getElementById('round-pip').textContent = '—';
       currentActiveCard = null;
       speakersThisDebate = 0;
+      skipFn = null;
+      clearTimeout(dialogueClearTimer); dialogueClearTimer = null;
+      pendingEvents = []; processingPaused = false;
       setStatus('Ready.');
       setProgress(0);
     });
@@ -1020,6 +1029,9 @@
       currentActiveCard = null;
       speakersThisDebate = 0;
       debateCompleted = false;
+      skipFn = null;
+      clearTimeout(dialogueClearTimer); dialogueClearTimer = null;
+      pendingEvents = []; processingPaused = false;
 
       const url = `/api/debate?topic=${encodeURIComponent(topic)}&num_rounds=${selectedRounds}&num_agents=${selectedAgents}${shortMode ? '&short=true' : ''}`;
       currentSource = new EventSource(url);
@@ -1058,12 +1070,26 @@
       typingActive = false;
       clearTimeout(typeTimeout);
 
-      const SLOW = 42; // ms per char during drain
+      const SLOW = 42;
+
+      // Click-to-skip during slow drain: flush instantly then go to reading indicator
+      skipFn = () => {
+        clearTimeout(typeTimeout);
+        if (typeQueue.length > 0 && currentActiveCard) {
+          typeDisplayed += typeQueue;
+          typeQueue = '';
+          const { bodyEl, cursorEl } = currentActiveCard;
+          bodyEl.textContent = typeDisplayed;
+          bodyEl.appendChild(cursorEl);
+        }
+        skipFn = null;
+        showReadingIndicator(onDone);
+      };
 
       function drain() {
-        if (!currentActiveCard) { onDone(); return; }
+        if (!currentActiveCard) { skipFn = null; onDone(); return; }
         if (typeQueue.length === 0) {
-          // All text visible — show ▼ and wait for reader
+          skipFn = null;
           showReadingIndicator(onDone);
           return;
         }
@@ -1089,23 +1115,27 @@
       if (!currentActiveCard) { onDone(); return; }
       const { boxEl, bodyEl, cursorEl } = currentActiveCard;
 
-      // Swap blinking cursor for a ▼ prompt
       cursorEl.classList.add('hidden');
       const ind = document.createElement('span');
       ind.className = 'read-indicator';
       ind.textContent = ' ▼';
       bodyEl.appendChild(ind);
 
-      // Dim the nameplate dots to show "done speaking"
       boxEl.classList.add('reading');
       boxEl.querySelectorAll('.ndot').forEach(d => { d.style.animation = 'none'; d.style.opacity = '0.15'; });
 
-      setStatus('Reading…');
+      setStatus('Click dialogue to continue · reading…');
 
-      // Hold long enough relative to word count (min 2.2s, max 6s)
       const words = typeDisplayed.trim().split(/\s+/).length;
       const hold  = Math.max(2200, Math.min(words * 160, 6000));
-      setTimeout(onDone, hold);
+      const timer = setTimeout(onDone, hold);
+
+      // Click-to-skip during reading pause
+      skipFn = () => {
+        clearTimeout(timer);
+        skipFn = null;
+        onDone();
+      };
     }
 
     function processEvent(ev) {
@@ -1129,11 +1159,16 @@
           break;
 
         case 'agent_start': {
-          const banner = pickBanner(ev.persona_id, ev.round);
-          if (banner) flashBanner(banner);
-          showGameDialogue(ev);
           speakersThisDebate++;
           setStatus(`${ev.persona_name} — ${ev.persona_role} is arguing…`);
+          const banner = pickBanner(ev.persona_id, ev.round);
+          if (banner) {
+            // Flash banner first; let it hang for a beat before the box slides in
+            flashBanner(banner);
+            setTimeout(() => showGameDialogue(ev), 440);
+          } else {
+            showGameDialogue(ev);
+          }
           break;
         }
 
@@ -1240,6 +1275,10 @@
       const p = PERSONAS[ev.persona_id];
       if (!p) return;
 
+      // Cancel any pending wrap-clear from the previous turn's close animation
+      clearTimeout(dialogueClearTimer);
+      skipFn = null;
+
       activatePortrait(ev.persona_id);
 
       const wrap = document.getElementById('game-dialogue-wrap');
@@ -1293,12 +1332,14 @@
       // Add to history
       addHistoryBubble({ text, side, personaColor, personaName, personaEmoji });
 
-      setTimeout(() => {
+      dialogueClearTimer = setTimeout(() => {
         const wrap = document.getElementById('game-dialogue-wrap');
         wrap.style.display = 'none';
         wrap.innerHTML = '';
+        dialogueClearTimer = null;
       }, 240);
 
+      skipFn = null;
       dimAllPortraits();
       currentActiveCard = null;
     }
