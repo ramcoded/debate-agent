@@ -532,18 +532,16 @@
       gap: 4px;
     }
 
-    .np-skip-hint {
+    .dialogue-skip-hint {
+      text-align: center;
+      padding: 6px 0 10px;
       font-family: 'JetBrains Mono', monospace;
-      font-size: 9px;
-      letter-spacing: 0.1em;
+      font-size: 10px;
+      letter-spacing: 0.12em;
       text-transform: uppercase;
       color: var(--text-dim);
-      margin-left: 10px;
-      opacity: 0.7;
       user-select: none;
-      border: 1px solid var(--border);
-      border-radius: 3px;
-      padding: 1px 6px;
+      animation: blinkCursor 1.4s step-end infinite;
     }
 
     .ndot {
@@ -1307,10 +1305,10 @@
               <span class="ndot" style="background:${p.color}"></span>
               <span class="ndot" style="background:${p.color}"></span>
             </span>
-            <span class="np-skip-hint">click to skip</span>
           </div>
           <div class="dialogue-body" id="db-${uid}"><span class="cursor" id="dc-${uid}"></span></div>
         </div>
+        <div class="dialogue-skip-hint">click to skip</div>
       `;
 
       currentActiveCard = {
