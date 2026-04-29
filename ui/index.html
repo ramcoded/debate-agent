@@ -1162,13 +1162,8 @@
           speakersThisDebate++;
           setStatus(`${ev.persona_name} — ${ev.persona_role} is arguing…`);
           const banner = pickBanner(ev.persona_id, ev.round);
-          if (banner) {
-            // Flash banner first; let it hang for a beat before the box slides in
-            flashBanner(banner);
-            setTimeout(() => showGameDialogue(ev), 440);
-          } else {
-            showGameDialogue(ev);
-          }
+          if (banner) flashBanner(banner);
+          showGameDialogue(ev);
           break;
         }
 
