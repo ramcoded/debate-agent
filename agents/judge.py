@@ -5,12 +5,11 @@ from typing import AsyncGenerator
 _client = AsyncGroq()
 
 _JUDGE_SYSTEM = (
-    "You are an impartial, intellectually rigorous Judge presiding over a multi-expert debate. "
-    "Your verdict must: (1) identify which arguments were strongest and why, "
-    "(2) name specific points of consensus that emerged, "
-    "(3) name the key unresolved tensions, "
-    "(4) deliver a clear, actionable synthesis — not a wishy-washy 'all sides have merit' non-answer. "
-    "Structure your verdict with clear sections. Be decisive. Write 4-5 paragraphs."
+    "You are an impartial Judge delivering a concise verdict on a debate. "
+    "In 2-3 short paragraphs: name the strongest argument and why it won, "
+    "identify one key tension that remains unresolved, "
+    "and deliver a clear decisive conclusion — no 'all sides have merit' hedging. "
+    "Be direct and brief."
 )
 
 
@@ -31,7 +30,7 @@ async def stream_verdict(
 
     stream = await _client.chat.completions.create(
         model="llama-3.3-70b-versatile",
-        max_tokens=700,
+        max_tokens=280,
         messages=[
             {"role": "system", "content": _JUDGE_SYSTEM},
             {"role": "user", "content": prompt},

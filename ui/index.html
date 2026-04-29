@@ -1050,8 +1050,8 @@
     // ── SSE event handler ──────────────────────────────────────────────
     function handleEvent(e) {
       const ev = JSON.parse(e.data);
-      // Buffer turn-boundary events while a reading pause is active
-      if (processingPaused && (ev.type === 'agent_start' || ev.type === 'round_start' || ev.type === 'judge_start')) {
+      // Buffer all events while a reading pause is active, except hard stops
+      if (processingPaused && ev.type !== 'debate_start' && ev.type !== 'debate_end' && ev.type !== 'error') {
         pendingEvents.push(ev);
         return;
       }
